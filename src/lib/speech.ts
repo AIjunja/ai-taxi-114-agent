@@ -167,6 +167,8 @@ export async function startMicMeter(onLevel: (level: number) => void): Promise<(
   const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
   const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
   const ctx = new Ctx()
+  // 일부 브라우저는 멈춘 상태로 시작해서 입력 크기가 0으로 나온다
+  await ctx.resume().catch(() => {})
   const src = ctx.createMediaStreamSource(stream)
   const analyser = ctx.createAnalyser()
   analyser.fftSize = 512

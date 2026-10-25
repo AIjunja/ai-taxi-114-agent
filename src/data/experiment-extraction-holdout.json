@@ -1,0 +1,376 @@
+{
+  "ranAt": "2026-10-25T10:56:07.422Z",
+  "method": "규칙 수정 뒤 새로 쓴 발화 16건(실제 녹취 아님)을 한 번만 채점",
+  "cases": 16,
+  "casesPassed": 13,
+  "slots": 32,
+  "correct": 29,
+  "wrongConfident": 3,
+  "missed": 0,
+  "byCategory": [
+    {
+      "category": "정확한 이름",
+      "cases": 2,
+      "pass": 2
+    },
+    {
+      "category": "구어·조사",
+      "cases": 3,
+      "pass": 3
+    },
+    {
+      "category": "나눠 말하기",
+      "cases": 2,
+      "pass": 1
+    },
+    {
+      "category": "애매한 이름",
+      "cases": 3,
+      "pass": 3
+    },
+    {
+      "category": "말 바꾸기",
+      "cases": 2,
+      "pass": 2
+    },
+    {
+      "category": "목록 밖·모호",
+      "cases": 4,
+      "pass": 2
+    }
+  ],
+  "rows": [
+    {
+      "id": "h01",
+      "category": "정확한 이름",
+      "utterances": [
+        "동서울터미널에서 서울대학교병원 가요"
+      ],
+      "expected": {
+        "origin": "동서울터미널",
+        "destination": "서울대학교병원"
+      },
+      "got": {
+        "origin": "동서울터미널",
+        "destination": "서울대학교병원"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h02",
+      "category": "정확한 이름",
+      "utterances": [
+        "신촌역에서 홍대입구역까지요"
+      ],
+      "expected": {
+        "origin": "신촌역",
+        "destination": "홍대입구역"
+      },
+      "got": {
+        "origin": "신촌역",
+        "destination": "홍대입구역"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h03",
+      "category": "구어·조사",
+      "utterances": [
+        "할머니가 지금 수원역에 계신데 수원역에서 출발해요",
+        "대전역 말고요 그냥 서울역으로요"
+      ],
+      "expected": {
+        "origin": "수원역",
+        "destination": "서울역"
+      },
+      "got": {
+        "origin": "수원역",
+        "destination": "서울역"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h04",
+      "category": "구어·조사",
+      "utterances": [
+        "아산병원 앞인데 잠실 롯데타워로 가 줘요"
+      ],
+      "expected": {
+        "origin": "서울아산병원",
+        "destination": "롯데월드타워"
+      },
+      "got": {
+        "origin": "서울아산병원",
+        "destination": "롯데월드타워"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h05",
+      "category": "구어·조사",
+      "utterances": [
+        "어 그 경복궁 있잖아요 거기서 타요"
+      ],
+      "expected": {
+        "origin": "경복궁",
+        "destination": "모름"
+      },
+      "got": {
+        "origin": "경복궁",
+        "destination": "모름"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h06",
+      "category": "나눠 말하기",
+      "utterances": [
+        "저기요 택시요",
+        "삼성서울병원에 있어요",
+        "집이 서울역 근처라서 서울역 가요"
+      ],
+      "expected": {
+        "origin": "삼성서울병원",
+        "destination": "서울역"
+      },
+      "got": {
+        "origin": "서울역",
+        "destination": "서울역"
+      },
+      "verdict": {
+        "origin": "wrong_confident",
+        "destination": "correct"
+      },
+      "pass": false
+    },
+    {
+      "id": "h07",
+      "category": "나눠 말하기",
+      "utterances": [
+        "광화문이요",
+        "거기서 타고요",
+        "김포공항 가요"
+      ],
+      "expected": {
+        "origin": "광화문광장",
+        "destination": "김포공항"
+      },
+      "got": {
+        "origin": "광화문광장",
+        "destination": "김포공항"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h08",
+      "category": "애매한 이름",
+      "utterances": [
+        "터미널 가요",
+        "지금 용산역이에요"
+      ],
+      "expected": {
+        "origin": "용산역",
+        "destination": "후보 제시"
+      },
+      "got": {
+        "origin": "용산역",
+        "destination": "후보 서울고속버스터미널·동서울터미널"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h09",
+      "category": "애매한 이름",
+      "utterances": [
+        "강남 세브란스에서 탈게요 공항 가요 김포요"
+      ],
+      "expected": {
+        "origin": "강남세브란스병원",
+        "destination": "김포공항"
+      },
+      "got": {
+        "origin": "강남세브란스병원",
+        "destination": "김포공항"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h10",
+      "category": "애매한 이름",
+      "utterances": [
+        "서울대병원 가요"
+      ],
+      "expected": {
+        "origin": "모름",
+        "destination": "후보 제시"
+      },
+      "got": {
+        "origin": "모름",
+        "destination": "후보 서울대학교병원·분당서울대학교병원"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h11",
+      "category": "말 바꾸기",
+      "utterances": [
+        "용산역에서 경복궁 가요",
+        "죄송해요 목적지를 서울성모병원으로 바꿔 주세요"
+      ],
+      "expected": {
+        "origin": "용산역",
+        "destination": "서울성모병원"
+      },
+      "got": {
+        "origin": "용산역",
+        "destination": "서울성모병원"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h12",
+      "category": "말 바꾸기",
+      "utterances": [
+        "시청역에서 탈게요",
+        "아 시청역 아니고 종로3가에서 탈게요",
+        "DDP 가요"
+      ],
+      "expected": {
+        "origin": "종로3가역",
+        "destination": "동대문디자인플라자"
+      },
+      "got": {
+        "origin": "종로3가역",
+        "destination": "동대문디자인플라자"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h13",
+      "category": "목록 밖·모호",
+      "utterances": [
+        "구로디지털단지역에서 탈게요",
+        "서울역 가요"
+      ],
+      "expected": {
+        "origin": "모름",
+        "destination": "서울역"
+      },
+      "got": {
+        "origin": "모름",
+        "destination": "서울역"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    },
+    {
+      "id": "h14",
+      "category": "목록 밖·모호",
+      "utterances": [
+        "서울역 롯데마트에서 탈게요",
+        "강남역 가요"
+      ],
+      "expected": {
+        "origin": "모름",
+        "destination": "강남역"
+      },
+      "got": {
+        "origin": "서울역",
+        "destination": "강남역"
+      },
+      "verdict": {
+        "origin": "wrong_confident",
+        "destination": "correct"
+      },
+      "pass": false
+    },
+    {
+      "id": "h15",
+      "category": "목록 밖·모호",
+      "utterances": [
+        "노량진 학원가에서 출발해요",
+        "여의도 가요"
+      ],
+      "expected": {
+        "origin": "모름",
+        "destination": "여의도공원"
+      },
+      "got": {
+        "origin": "노량진수산시장",
+        "destination": "여의도공원"
+      },
+      "verdict": {
+        "origin": "wrong_confident",
+        "destination": "correct"
+      },
+      "pass": false
+    },
+    {
+      "id": "h16",
+      "category": "목록 밖·모호",
+      "utterances": [
+        "병원 갔다가 집에 가야 돼요"
+      ],
+      "expected": {
+        "origin": "모름",
+        "destination": "모름"
+      },
+      "got": {
+        "origin": "모름",
+        "destination": "모름"
+      },
+      "verdict": {
+        "origin": "correct",
+        "destination": "correct"
+      },
+      "pass": true
+    }
+  ]
+}

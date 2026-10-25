@@ -111,6 +111,11 @@ const ALIASES = ALIAS_TABLE.map(([alias, ids]) => ({ key: normalize(alias), plac
   (a, b) => b.key.length - a.key.length,
 )
 
+/** 별칭 목록 (긴 것부터). 추출기가 한 문장 안의 여러 장소를 찾을 때 쓴다. */
+export function aliasEntries(): { key: string; places: Place[] }[] {
+  return ALIASES
+}
+
 /** 발화에서 장소 후보를 찾는다. 가장 구체적인(긴) 별칭이 이긴다. */
 export function resolvePlaces(utterance: string): Place[] {
   const text = normalize(utterance)

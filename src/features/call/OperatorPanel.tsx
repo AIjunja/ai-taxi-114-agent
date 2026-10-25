@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Check, Loader2, Lock, MonitorPlay, Radio } from 'lucide-react'
 import { MiniMap } from '../../components/MiniMap'
 import type { DialogState } from '../dialog/machine'
+import type { Place } from '../dialog/places'
 import type { WorkerView } from './useCall'
 
 const MODE_BADGE: Record<WorkerView['mode'], { text: string; cls: string }> = {
@@ -25,27 +26,45 @@ function Row({ k, v, state }: { k: string; v: string; state: 'empty' | 'pending'
   )
 }
 
-function WorkOrder({ st }: { st: DialogState }) {
+export interface OrderView {
+  origin?: Place | null
+  destination?: Place | null
+  /** 확인 중인 내용 (예: "서울역 확인 중") */
+  originNote?: string
+  destinationNote?: string
+  approval: 'locked' | 'pending' | 'done'
+  pin?: Place | null
+}
+
+/** 대화 엔진 상태를 작업 지시서 형태로 바꾼다 (완전 자동 시나리오). */
+export function orderFromDialog(st: DialogState): OrderView {
   const pendingOrigin = !st.origin && (st.stage === 'confirmOrigin' || st.stage === 'chooseOrigin')
-  const pendingDest = !st.destination && (st.stage === 'confirmDestination' || st.stage === 'chooseDestination')
-  const changingDest = Boolean(st.destination) && (st.stage === 'confirmDestination' || st.stage === 'chooseDestination')
+  const pendingDest = (st.stage === 'confirmDestination' || st.stage === 'chooseDestination')
+  const candidateNote = st.candidate ? `${st.candidate.name} 확인 중` : `후보 ${st.candidates?.length ?? 0}곳`
+  return {
+    origin: st.origin,
+    destination: pendingDest ? null : st.destination,
+    originNote: pendingOrigin ? candidateNote : st.origin ? undefined : '듣는 중',
+    destinationNote: pendingDest ? candidateNote : undefined,
+    approval: st.approved ? 'done' : st.stage === 'finalApproval' ? 'pending' : 'locked',
+    pin: st.candidate ?? null,
+  }
+}
+
+function WorkOrder({ order }: { order: OrderView }) {
   return (
     <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       <div className="rounded-xl border border-line bg-surface px-4 py-1" data-testid="work-order">
         <Row k="접수 채널" v="114 전화 · 번호 비공개" state="done" />
+        <Row k="출발지" v={order.origin ? order.origin.name : order.originNote ?? '-'} state={order.origin ? 'done' : order.originNote && order.originNote !== '듣는 중' ? 'pending' : 'empty'} />
+        <Row k="목적지" v={order.destination ? order.destination.name : order.destinationNote ?? '-'} state={order.destination ? 'done' : order.destinationNote ? 'pending' : 'empty'} />
         <Row
-          k="출발지"
-          v={st.origin ? st.origin.name : pendingOrigin ? (st.candidate ? `${st.candidate.name} 확인 중` : `후보 ${st.candidates?.length}곳`) : '듣는 중'}
-          state={st.origin ? 'done' : pendingOrigin ? 'pending' : 'empty'}
+          k="최종 승인"
+          v={order.approval === 'done' ? '승인 받음' : order.approval === 'pending' ? '고객 답변 기다리는 중' : '호출 잠김'}
+          state={order.approval === 'done' ? 'done' : order.approval === 'pending' ? 'pending' : 'locked'}
         />
-        <Row
-          k="목적지"
-          v={changingDest && st.candidate ? `${st.candidate.name}(으)로 변경 확인 중` : st.destination ? st.destination.name : pendingDest ? (st.candidate ? `${st.candidate.name} 확인 중` : `후보 ${st.candidates?.length}곳`) : '-'}
-          state={changingDest ? 'pending' : st.destination ? 'done' : pendingDest ? 'pending' : 'empty'}
-        />
-        <Row k="최종 승인" v={st.approved ? '승인 받음' : st.stage === 'finalApproval' ? '고객 답변 기다리는 중' : '호출 잠김'} state={st.approved ? 'done' : st.stage === 'finalApproval' ? 'pending' : 'locked'} />
       </div>
-      <MiniMap origin={st.origin} destination={st.destination} pending={st.candidate ?? null} height={186} />
+      <MiniMap origin={order.origin} destination={order.destination} pending={order.pin ?? null} height={186} />
     </div>
   )
 }
@@ -114,7 +133,7 @@ function RecordingView({ w }: { w: WorkerView }) {
   )
 }
 
-export function OperatorPanel({ st, w }: { st: DialogState; w: WorkerView }) {
+export function OperatorPanel({ order, w, idleTitle, idleText }: { order: OrderView; w: WorkerView; idleTitle?: string; idleText?: string }) {
   const badge = MODE_BADGE[w.mode]
   const r = w.result
   const elapsed = w.steps.at(-1)?.t ?? 0
@@ -139,12 +158,12 @@ export function OperatorPanel({ st, w }: { st: DialogState; w: WorkerView }) {
       </header>
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-        <WorkOrder st={st} />
+        <WorkOrder order={order} />
 
         {w.mode === 'idle' && (
           <div className="rounded-xl border border-dashed border-line bg-surface p-4 text-sm leading-relaxed text-muted">
-            <p className="font-bold text-ink">고객이 최종 승인하면 시작해요</p>
-            <p className="mt-1">서버의 Chromium이 이 사이트의 택시 호출 콘솔을 열고, Playwright가 출발지·목적지를 검색해 고르고, 위치를 확인하고, 호출 버튼을 눌러요. 그 화면이 여기에 실시간으로 나와요.</p>
+            <p className="font-bold text-ink">{idleTitle ?? '고객이 최종 승인하면 시작해요'}</p>
+            <p className="mt-1">{idleText ?? '서버의 Chromium이 이 사이트의 택시 호출 콘솔을 열고, Playwright가 출발지·목적지를 검색해 고르고, 위치를 확인하고, 호출 버튼을 눌러요. 그 화면이 여기에 실시간으로 나와요.'}</p>
             <a href="/console" target="_blank" rel="noreferrer" className="mt-2 inline-block font-bold text-accent underline underline-offset-2">
               호출 콘솔 직접 열어 보기
             </a>

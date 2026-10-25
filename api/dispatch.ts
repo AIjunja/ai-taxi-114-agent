@@ -8,6 +8,8 @@ import { createDispatchService } from '../server/dispatch-core.js'
 const secret = process.env.DISPATCH_SECRET ?? 'poc-mock-dispatch'
 const service = createDispatchService({
   disabled: process.env.DISPATCH_DISABLED === '1',
+  // 로컬 테스트에서만 높인다. 공개 서버는 기본값(IP별 10분 20회)
+  rateLimit: { max: Number(process.env.DISPATCH_RATE_MAX ?? 20), windowMs: 10 * 60_000 },
   sign: (data) => createHmac('sha256', secret).update(data).digest('base64url').slice(0, 22),
 })
 

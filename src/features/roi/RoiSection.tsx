@@ -4,8 +4,8 @@ import { CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContai
 import { Badge, Button, formatWon, Panel } from '../../components/ui'
 import { calculateRoi, costCurve, DEFAULT_ROI_INPUT, MONTHLY_WORK_HOURS, type RoiInput } from './roi'
 
-interface Field {
-  key: keyof RoiInput
+export interface Field<K extends string = keyof RoiInput> {
+  key: K
   label: string
   unit: string
   min: number
@@ -26,7 +26,7 @@ const FIELDS: Field[] = [
   { key: 'initialCost', label: '초기 구축비', unit: '원', min: 0, max: 200_000_000, step: 1_000_000, hint: '가정' },
 ]
 
-function NumberField({ f, value, onChange }: { f: Field; value: number; onChange: (v: number) => void }) {
+export function NumberField({ f, value, onChange }: { f: Field<string>; value: number; onChange: (v: number) => void }) {
   const shown = +(value * (f.scale ?? 1)).toFixed(2)
   const set = (v: number) => onChange(Math.max(f.min, Math.min(f.max, v)) / (f.scale ?? 1))
   const id = `roi-${f.key}`
@@ -71,7 +71,7 @@ function NumberField({ f, value, onChange }: { f: Field; value: number; onChange
   )
 }
 
-function Kpi({ label, value, sub, testId, tone }: { label: string; value: string; sub?: string; testId: string; tone?: 'good' | 'bad' }) {
+export function Kpi({ label, value, sub, testId, tone }: { label: string; value: string; sub?: string; testId: string; tone?: 'good' | 'bad' }) {
   return (
     <div className="rounded-lg bg-bg p-3">
       <p className="text-xs text-muted">{label}</p>

@@ -1,0 +1,46 @@
+{
+  "ranAt": "2026-10-25T11:08:53.809Z",
+  "method": "같은 통화 4건을 Playwright로 두 방식 모두 재현해 상담원 조작을 셌어요. 수동은 정답이 첫 후보로 뜨는 가장 짧은 검색어만 입력했고(키 입력은 한글 자모 수), 보조는 확인·후보 선택·직접 고르기 클릭만 셌어요. 고객 말 입력은 세지 않았어요.",
+  "rows": [
+    {
+      "sample": "나눠 말하기",
+      "manual": 17,
+      "assisted": 4,
+      "manualDetail": "클릭 8 + 키 입력 9",
+      "assistedDetail": "클릭 4",
+      "uiCounter": 4,
+      "note": "AI 제안 그대로 확인",
+      "worker": "assigned"
+    },
+    {
+      "sample": "이름이 겹치는 병원",
+      "manual": 18,
+      "assisted": 5,
+      "manualDetail": "클릭 8 + 키 입력 10",
+      "assistedDetail": "클릭 5",
+      "uiCounter": 5,
+      "note": "목적지 후보 선택",
+      "worker": "assigned"
+    },
+    {
+      "sample": "중간에 목적지 변경",
+      "manual": 13,
+      "assisted": 4,
+      "manualDetail": "클릭 8 + 키 입력 5",
+      "assistedDetail": "클릭 4",
+      "uiCounter": 4,
+      "note": "AI 제안 그대로 확인",
+      "worker": "assigned"
+    },
+    {
+      "sample": "AI가 출발지를 틀림",
+      "manual": 13,
+      "assisted": 5,
+      "manualDetail": "클릭 8 + 키 입력 5",
+      "assistedDetail": "클릭 5",
+      "uiCounter": 4,
+      "note": "출발지 직접 수정 (AI: 서울역)",
+      "worker": "no_taxi"
+    }
+  ]
+}

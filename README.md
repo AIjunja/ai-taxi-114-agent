@@ -1,55 +1,65 @@
-# 114 AI 택시 상담 PoC
+# 114 상담원 반복 업무 줄이기 PoC
 
-02-114 '택시 대신 불러주기'를 AI 상담원이 처리하는 **개인 PoC**예요. 고객이 말하면 AI가 듣고 되묻고, 승인을 받으면 Playwright가 택시 호출 콘솔(Mock)을 실제 브라우저로 조작해 배차까지 처리해요.
-KT IS·카카오모빌리티 공식 서비스가 아니고, 실제 택시 호출·결제·카카오 T 연동은 하지 않아요.
+02-114 '택시 대신 불러주기'에서 **상담원의 반복 업무(받아 적기·검색 입력·호출 화면 조작·결과 안내)를 얼마나 줄일 수 있는지** 검증하는 개인 PoC예요.
+KT IS의 공식 사업이 아니고, 실제 택시 호출·결제·카카오 T 연동은 하지 않아요.
 
 - 공개 데모: https://ai-taxi-114-agent.vercel.app
-- 호출 콘솔: https://ai-taxi-114-agent.vercel.app/console
-- 디자인 규칙: [DESIGN.md](DESIGN.md)
+- 판단 기록: [docs/decision-log.md](docs/decision-log.md) · 면접 메모: [docs/interview-qa.md](docs/interview-qa.md)
 
-## 무엇이 실제고 무엇이 Mock인가
+## 기본 시나리오: 상담원 보조
 
-| 기능 | 상태 | 위치 |
-|---|---|---|
-| 음성 인식 (STT) | 실제 · 브라우저 Web Speech API | `src/lib/speech.ts` |
-| 음성 합성 (TTS) | 실제 · 브라우저 Web Speech API | `src/lib/speech.ts` |
-| 대화 엔진 | 실제 · 규칙 기반 (언어 모델 없음) | `src/features/dialog/` |
-| 콘솔 자동화 | 실제 · Vercel 서버 Chromium + Playwright, 화면 실시간 전송 | `api/worker.ts`, `server/worker-core.ts` |
-| 택시 호출 콘솔 | Mock 업무 웹 | `src/features/console/` |
-| 배차 | Mock API (대기 → 배정 → 취소) | `api/dispatch.ts`, `server/dispatch-core.ts` |
-| 자동 시연 | 고객 발화는 합성, 오른쪽 화면은 실제 Playwright 실행 녹화 | `src/features/call/demo.ts`, `public/evidence/` |
-| 비용 계산 기본값 | 가정 (공개 기사 수치 + 일반 가정) | `src/features/roi/roi.ts` |
+1. 고객이 한 말 (예시 통화, 직접 입력, 또는 받아쓰기)
+2. AI가 출발지·목적지를 **제안** — 근거(몇 번째 말, 어떤 표현)와 함께. 이름이 겹치면 후보, 모르면 '모름'
+3. 상담원이 확인·수정
+4. 상담원이 고객 최종 승인을 받음
+5. Playwright가 서버 Chromium으로 Mock 호출 콘솔에 입력하고 호출 버튼을 누름 (화면 실시간 전송)
+6. 상담원이 준비된 안내 문구를 읽음
 
-## 통화 흐름
+비교용으로 처음 만든 **완전 자동**(AI 음성 상담원이 혼자 처리)도 그대로 남겨 두었어요.
 
-1. 첫인사와 소리 확인 → 2. 출발지 듣기 → 3. 되읽기(겹치면 후보 제시) → 4. 목적지 → 5. 되읽기 → 6. 최종 확인 → 7. 승인 → 8. Worker가 콘솔 조작 → 9. 배차 결과 음성 안내 → 10. 필요하면 취소
+## 실험 결과 요약 (2026-10-25)
 
-어느 단계에서든 "뭐라고요?", "천천히 말해 주세요", "잘 안 들려요", "목적지 바꿀래요", "취소", "상담원"을 알아들어요.
+| 실험 | 결과 |
+|---|---|
+| 장소 정리 정확도 | 1차 26/34 → 규칙 수정 후 같은 데이터 32/34 → **처음 보는 16건 13/16** (자신 있게 틀림 3칸) |
+| 공개 서버 Playwright 입력·호출 | 6/6 성공, 평균 11.6초. 동시 실행 제한은 인스턴스마다라 **실패** |
+| 상담원 조작 수 | 수동 13~18회 → 보조 4~5회 (시간은 재지 못함) |
+| 음성 인식 | **검증 실패** — Chrome(자동화) 결과 없음, Edge network 오류, 사용자 직접 시도 실패 |
+| 음성 합성 | 기기 합성음 1개. 사람 수준이라고 주장하지 않음 |
+| 자동 테스트 | 단위 63, E2E 로컬 41, E2E 공개 URL 40 통과 |
 
-## 실행
+발화 데이터는 직접 만든 예시예요(실제 녹취 아님).
 
-```bash
-npm install
-npx playwright install chromium
-npm run dev              # http://localhost:5173 (로컬에서도 /api/worker가 실제 Chromium을 띄워요)
-npm test                 # 단위 테스트
-npm run test:e2e         # E2E (데스크톱·모바일)
-npm run record:worker    # 자동 시연용 Playwright 실행 녹화 → public/evidence/
+## 코드 구조
+
+```
+src/features/assist     상담원 보조: 장소 정리(extract.ts), 실험 데이터, 화면
+src/features/dialog     장소 목록, 대화 엔진(완전 자동용)
+src/features/call       완전 자동 음성 통화, 업무 자동화 패널
+src/features/console    Mock 택시 호출 콘솔 (Playwright가 조작하는 화면)
+src/features/diagnostics 음성 진단 (/diagnostics)
+src/features/roi        비용 계산: assist-roi.ts(기본), roi.ts(완전 자동 대체, 참고)
+src/features/report     적용 전후·실험 결과·판단 기록
+server/                 Mock 배차, Worker 공통 코드
+api/                    Vercel Functions (/api/dispatch, /api/worker)
+scripts/                실험·녹화·진단 스크립트
 ```
 
-공개 URL 대상 E2E: `E2E_BASE_URL=https://ai-taxi-114-agent.vercel.app npm run test:e2e`
+## 실행과 실험 재현
+
+```bash
+npm install && npx playwright install chromium
+npm run dev
+npm test                                   # 단위 테스트
+npm run test:e2e                           # E2E
+npx tsx scripts/run-experiments.ts         # 실험 1 (SET=holdout 이면 새 발화)
+npx tsx scripts/worker-trials.ts           # 실험 2 (공개 서버)
+npx tsx scripts/measure-actions.ts         # 실험 3 (로컬 서버)
+WAV=... npx tsx scripts/diagnose-voice.ts  # 실험 4
+```
 
 ## 안전장치
 
-- 승인 없는 호출 거절: 대화 엔진, Worker(403·브라우저 실행 전 거절), 배차 API(403)
-- Worker는 이 배포 주소만 열고 다른 호스트 요청은 차단. 동시 1개, IP별 10분 8회, 50초 제한
-- 같은 요청 키는 새로 배차하지 않음. 요청 ID는 서명해 위조를 막음
-- `WORKER_DISABLED=1`, `DISPATCH_DISABLED=1`로 바로 멈출 수 있음. Worker를 못 쓰면 API로 호출하고 화면에 표시
-- 음성·대화 미저장. 서버 로그에는 결과 종류만 남김
-
-## 한계
-
-- 자동화로 띄운 Chrome·Edge에서는 음성 인식 서버가 빈 결과를 돌려줘서, 실제 STT 인식은 자동 테스트로 검증하지 못했어요. STT 이후 흐름은 인식 대역으로 검증했어요.
-- 음성 인식은 Chrome·Edge·Safari 중심이에요. Chrome·Edge는 인식을 위해 음성을 브라우저 회사 서버로 보내요.
-- 알아듣는 장소는 데모용 29곳이에요. 언어 모델을 쓰지 않아 자유로운 표현은 못 알아들을 수 있어요.
-- 요청량 제한은 서버리스 인스턴스 메모리 기준이에요.
+- 상담원 확인과 고객 승인 전에는 실행 버튼이 잠겨 있고, Worker·배차 API도 승인 없는 요청을 거절해요
+- Worker는 이 배포 주소만 열고 다른 주소 요청은 막아요. IP별 10분 8회, 50초 제한
+- 음성·대화를 저장하지 않아요

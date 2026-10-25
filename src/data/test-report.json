@@ -1,91 +1,76 @@
 {
-  "checkedAt": "2026-10-25T10:14:02Z",
-  "environment": "공개 URL(ai-taxi-114-agent.vercel.app) · Chromium 데스크톱 1280px·모바일 Pixel 7 · 실제 Chrome",
+  "checkedAt": "2026-10-25T11:18:36Z",
+  "environment": "공개 URL과 로컬 · Chromium 데스크톱 1280px·모바일 Pixel 7",
   "suites": [
     {
       "id": "unit",
-      "name": "단위 테스트 (Vitest)",
-      "passed": 49,
-      "total": 49
+      "name": "단위 테스트",
+      "passed": 63,
+      "total": 63
     },
     {
       "id": "e2e-local",
       "name": "E2E 로컬",
-      "passed": 28,
-      "total": 28
+      "passed": 41,
+      "total": 41
     },
     {
       "id": "e2e-prod",
       "name": "E2E 공개 URL",
-      "passed": 27,
-      "total": 27
+      "passed": 40,
+      "total": 40
     }
   ],
   "checks": [
     {
-      "item": "말이 끝나면 버튼 없이 듣고, 들은 말로 대화가 이어진다",
-      "how": "E2E: 음성 인식 대역으로 6턴 자동 진행",
+      "item": "AI 정리 뒤 상담원 확인·고객 승인 전에는 Playwright가 실행되지 않는다",
+      "how": "E2E: 확인 전 실행 버튼 잠김, Worker 요청 0건",
       "result": "통과"
     },
     {
-      "item": "실제 TTS가 문장마다 읽고 끝난다",
-      "how": "실제 Chrome: speechSynthesis 시작·종료 이벤트 확인",
+      "item": "승인 뒤 Playwright가 공개 서버에서 콘솔에 입력·호출한다",
+      "how": "E2E 공개 URL: 서버 Chromium 화면·단계 수신, 결과 안내",
       "result": "통과"
     },
     {
-      "item": "실제 STT가 한국어를 글자로 바꾼다",
-      "how": "자동화 Chrome·Edge는 인식 서버가 빈 결과를 돌려줘서 자동 검증 불가",
-      "result": "사람 확인 필요"
-    },
-    {
-      "item": "장소가 겹치면 후보를 읽고 번호로 고른다",
-      "how": "단위·E2E: 세브란스 → 1번·2번",
+      "item": "이름이 겹치면 후보를 보여주고, 틀린 제안도 상담원이 바꾼다",
+      "how": "E2E: 세브란스 후보 선택, 동대문시장 → 직접 수정",
       "result": "통과"
     },
     {
-      "item": "최종 승인 전에는 호출하지 않는다",
-      "how": "단위·E2E: 승인 전 Worker·배차 요청 0건, 서버 403",
+      "item": "목록에 없는 곳은 모른다고 표시한다",
+      "how": "E2E: 농협 앞·큰 병원",
       "result": "통과"
     },
     {
-      "item": "목적지·출발지를 바꾸면 다시 확인한다",
-      "how": "단위·E2E: 아니요 → 가는 곳 → 김포공항",
+      "item": "받아쓰기 실패 시 원인과 음성 진단 링크",
+      "how": "E2E: 인식 서버 오류 대역",
       "result": "통과"
     },
     {
-      "item": "Playwright가 공개 서버에서 콘솔을 실제 조작한다",
-      "how": "E2E 공개 URL: 서버 Chromium 화면 수신, 호출 버튼 클릭 단계",
+      "item": "음성 진단이 지원·권한·인식·목소리를 나눠 판정한다",
+      "how": "E2E + Chrome·Edge·내장 창 실행",
       "result": "통과"
     },
     {
-      "item": "배차 뒤 취소도 Worker가 콘솔에서 처리한다",
-      "how": "E2E: 취소 버튼 클릭 단계와 취소 안내",
+      "item": "실제 사람 목소리로 STT 인식 성공",
+      "how": "자동화 Chrome은 결과 없음, Edge는 network 오류, 사용자 직접 시도도 실패",
+      "result": "실패"
+    },
+    {
+      "item": "TTS가 사람 상담원처럼 자연스럽다",
+      "how": "기기 합성음(Heami) 1개만 확인",
+      "result": "주장 안 함"
+    },
+    {
+      "item": "완전 자동(비교용): 음성 루프·후보·수정·취소·승인 게이트",
+      "how": "E2E: 인식 대역으로 6턴 자동 진행, 승인 전 요청 0건",
       "result": "통과"
     },
     {
-      "item": "Worker를 못 쓰면 API로 호출하고 사실을 밝힌다",
-      "how": "E2E: /api/worker 429 → 대체 안내",
-      "result": "통과"
-    },
-    {
-      "item": "승인 뒤 반복 발화에도 Worker는 한 번만 실행한다",
-      "how": "E2E: 요청 수 1",
-      "result": "통과"
-    },
-    {
-      "item": "다시 듣기·천천히·소리 확인",
-      "how": "E2E: 속도 0.78로 다시 읽기, 안 들림 → 크고 천천히",
-      "result": "통과"
-    },
-    {
-      "item": "마이크가 없거나 거부해도 글로 계속한다",
-      "how": "E2E: 권한 거부·음성 인식 미지원",
-      "result": "통과"
-    },
-    {
-      "item": "자동 시연이 끝까지 진행되고 녹화임을 표시한다",
-      "how": "E2E: 일시정지 유지, 녹화 꼬리표, 배차 안내",
-      "result": "통과"
+      "item": "Worker 동시 실행 1개 제한",
+      "how": "공개 URL에 2건 동시 요청 → 둘 다 실행됨 (인스턴스마다 제한)",
+      "result": "실패"
     },
     {
       "item": "비용 계산이 입력에 맞게 바뀐다",
@@ -94,7 +79,7 @@
     },
     {
       "item": "모바일·데스크톱 가로 넘침 없음, 키 노출 없음",
-      "how": "E2E: 넘침 0px, 번들 키 패턴 검사",
+      "how": "E2E",
       "result": "통과"
     }
   ]

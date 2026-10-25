@@ -19,5 +19,5 @@ export default defineConfig({
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined
-    : { command: 'npx vite --port 5173 --strictPort', url: baseURL, reuseExistingServer: true },
+    : { command: 'npx vite --port 5173 --strictPort', url: baseURL, reuseExistingServer: true, env: { DISPATCH_RATE_MAX: '1000', WORKER_RATE_MAX: '1000' } },
 })

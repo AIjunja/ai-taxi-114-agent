@@ -1,0 +1,89 @@
+{
+  "ranAt": "2026-10-25T11:01:28.014Z",
+  "base": "https://ai-taxi-114-agent.vercel.app",
+  "method": "공개 URL의 /api/worker를 6번 차례로 호출 (서버 Chromium이 콘솔을 열어 입력·호출). 걸린 시간은 이 PC에서 잰 값",
+  "runs": 6,
+  "succeeded": 6,
+  "avgTotalMs": 11648,
+  "avgFirstFrameMs": 1478,
+  "trials": [
+    {
+      "route": "seoul-station → asan",
+      "ok": true,
+      "status": "assigned",
+      "totalMs": 15263,
+      "workerMs": 13688,
+      "firstFrameMs": 5470,
+      "frames": 85,
+      "steps": 12,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "route": "gimpo-airport → gangnam-station",
+      "ok": true,
+      "status": "assigned",
+      "totalMs": 10612,
+      "workerMs": 10294,
+      "firstFrameMs": 722,
+      "frames": 96,
+      "steps": 12,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "route": "yongsan-station → samsung-hospital",
+      "ok": true,
+      "status": "assigned",
+      "totalMs": 10767,
+      "workerMs": 10481,
+      "firstFrameMs": 668,
+      "frames": 95,
+      "steps": 12,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "route": "express-terminal → st-mary",
+      "ok": true,
+      "status": "assigned",
+      "totalMs": 12335,
+      "workerMs": 12055,
+      "firstFrameMs": 663,
+      "frames": 120,
+      "steps": 12,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "route": "city-hall → noryangjin",
+      "ok": true,
+      "status": "assigned",
+      "totalMs": 10835,
+      "workerMs": 10537,
+      "firstFrameMs": 667,
+      "frames": 96,
+      "steps": 12,
+      "attempts": 1,
+      "error": null
+    },
+    {
+      "route": "hongik-station → severance",
+      "ok": true,
+      "status": "assigned",
+      "totalMs": 10076,
+      "workerMs": 9785,
+      "firstFrameMs": 675,
+      "frames": 81,
+      "steps": 12,
+      "attempts": 1,
+      "error": null
+    }
+  ],
+  "concurrency": {
+    "ranAt": "2026-10-25T11:02:23Z",
+    "method": "같은 순간에 /api/worker를 2번 호출",
+    "result": "둘 다 성공 (12.4초, 16.1초)",
+    "finding": "'동시에 1개만' 제한이 서버리스 인스턴스마다 걸려서, 실제로는 여러 개가 동시에 실행됐어요. 비용 상한을 보장하지 못해요."
+  }
+}
