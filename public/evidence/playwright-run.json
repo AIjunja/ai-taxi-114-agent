@@ -1,0 +1,69 @@
+{
+  "recordedAt": "2026-10-25T09:06:25.960Z",
+  "environment": "로컬 개발 서버 (win32, Playwright 1.64.1)",
+  "baseUrl": "http://localhost:5173",
+  "job": {
+    "origin": "서울역",
+    "destination": "세브란스병원",
+    "approved": true
+  },
+  "steps": [
+    {
+      "t": 148,
+      "action": "작업 받음",
+      "detail": "서울역 → 세브란스병원 · 승인 true"
+    },
+    {
+      "t": 1136,
+      "action": "업무 웹 열기",
+      "detail": "/console?fail=once"
+    },
+    {
+      "t": 1431,
+      "action": "출발지 입력",
+      "detail": "서울역"
+    },
+    {
+      "t": 1693,
+      "action": "목적지 입력",
+      "detail": "세브란스병원"
+    },
+    {
+      "t": 1972,
+      "action": "최종 승인 체크"
+    },
+    {
+      "t": 2251,
+      "action": "호출 버튼 클릭",
+      "detail": "1번째 시도"
+    },
+    {
+      "t": 3073,
+      "action": "오류 감지",
+      "detail": "배차 서버 응답이 늦어요. 잠시 뒤 다시 눌러 주세요. (시험용으로 넣은 오류)"
+    },
+    {
+      "t": 3073,
+      "action": "복구",
+      "detail": "1초 기다린 뒤 다시 시도"
+    },
+    {
+      "t": 4353,
+      "action": "호출 버튼 클릭",
+      "detail": "2번째 시도"
+    },
+    {
+      "t": 4359,
+      "action": "결과 읽기",
+      "detail": "배차됨 89하 6805"
+    }
+  ],
+  "result": {
+    "status": "assigned",
+    "plate": "89하 6805",
+    "attempts": 2
+  },
+  "durationMs": 5898,
+  "video": "/evidence/playwright-run.webm",
+  "poster": "/evidence/playwright-run.png"
+}
