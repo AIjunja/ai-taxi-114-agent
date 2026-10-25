@@ -1,0 +1,362 @@
+{
+ "c1": {
+  "text": "네, 114 택시 대신 불러드리기입니다. 어디서 타세요?",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 6.58
+ },
+ "u1": {
+  "text": "여기 서울역이에요.",
+  "voice": "ko-KR-InJoonNeural",
+  "sec": 3.46
+ },
+ "u2": {
+  "text": "세브란스 병원 가야 돼요.",
+  "voice": "ko-KR-InJoonNeural",
+  "sec": 3.89
+ },
+ "c2": {
+  "text": "신촌 세브란스요, 강남 세브란스요?",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 4.2
+ },
+ "u3": {
+  "text": "신촌이요.",
+  "voice": "ko-KR-InJoonNeural",
+  "sec": 2.52
+ },
+ "c3": {
+  "text": "서울역에서 신촌세브란스병원으로 택시 불러드릴까요?",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 5.04
+ },
+ "u4": {
+  "text": "네, 불러 주세요.",
+  "voice": "ko-KR-InJoonNeural",
+  "sec": 3.96
+ },
+ "c4": {
+  "text": "네, 지금 바로 불러드릴게요. 잠시만 기다려 주세요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 6.38
+ },
+ "r_ok": {
+  "text": "택시가 잡혔어요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.54
+ },
+ "r_plate": {
+  "text": "차 번호는",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.11
+ },
+ "r_end": {
+  "text": "이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "r_none": {
+  "text": "지금 근처에 빈 택시가 없어요. 몇 분 뒤에 다시 불러드릴까요?",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 6.7
+ },
+ "u5": {
+  "text": "고마워요.",
+  "voice": "ko-KR-InJoonNeural",
+  "sec": 2.74
+ },
+ "eta1": {
+  "text": "약 1분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.95
+ },
+ "eta2": {
+  "text": "약 2분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.81
+ },
+ "eta3": {
+  "text": "약 3분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.02
+ },
+ "eta4": {
+  "text": "약 4분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.95
+ },
+ "eta5": {
+  "text": "약 5분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.93
+ },
+ "eta6": {
+  "text": "약 6분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.93
+ },
+ "eta7": {
+  "text": "약 7분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.0
+ },
+ "eta8": {
+  "text": "약 8분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.98
+ },
+ "eta9": {
+  "text": "약 9분 뒤에 도착해요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.86
+ },
+ "d0": {
+  "text": "영",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d1": {
+  "text": "일",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d2": {
+  "text": "이",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d3": {
+  "text": "삼",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d4": {
+  "text": "사",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d5": {
+  "text": "오",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d6": {
+  "text": "육",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d7": {
+  "text": "칠",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d8": {
+  "text": "팔",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "d9": {
+  "text": "구",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_가": {
+  "text": "가",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_나": {
+  "text": "나",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_다": {
+  "text": "다",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_라": {
+  "text": "라",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_마": {
+  "text": "마",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_바": {
+  "text": "바",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_사": {
+  "text": "사",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_아": {
+  "text": "아",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_자": {
+  "text": "자",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "h_하": {
+  "text": "하",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 1.87
+ },
+ "car_흰색_쏘나타": {
+  "text": "흰색 쏘나타 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.88
+ },
+ "car_흰색_K5": {
+  "text": "흰색 K5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.1
+ },
+ "car_흰색_아이오닉 5": {
+  "text": "흰색 아이오닉 5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.22
+ },
+ "car_흰색_그랜저": {
+  "text": "흰색 그랜저 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.86
+ },
+ "car_흰색_EV6": {
+  "text": "흰색 EV6 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.93
+ },
+ "car_흰색_K8": {
+  "text": "흰색 K8 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.9
+ },
+ "car_검은색_쏘나타": {
+  "text": "검은색 쏘나타 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.02
+ },
+ "car_검은색_K5": {
+  "text": "검은색 K5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.19
+ },
+ "car_검은색_아이오닉 5": {
+  "text": "검은색 아이오닉 5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.36
+ },
+ "car_검은색_그랜저": {
+  "text": "검은색 그랜저 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.05
+ },
+ "car_검은색_EV6": {
+  "text": "검은색 EV6 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.07
+ },
+ "car_검은색_K8": {
+  "text": "검은색 K8 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.02
+ },
+ "car_은색_쏘나타": {
+  "text": "은색 쏘나타 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.88
+ },
+ "car_은색_K5": {
+  "text": "은색 K5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.1
+ },
+ "car_은색_아이오닉 5": {
+  "text": "은색 아이오닉 5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.22
+ },
+ "car_은색_그랜저": {
+  "text": "은색 그랜저 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.86
+ },
+ "car_은색_EV6": {
+  "text": "은색 EV6 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.9
+ },
+ "car_은색_K8": {
+  "text": "은색 K8 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.9
+ },
+ "car_회색_쏘나타": {
+  "text": "회색 쏘나타 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.81
+ },
+ "car_회색_K5": {
+  "text": "회색 K5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.02
+ },
+ "car_회색_아이오닉 5": {
+  "text": "회색 아이오닉 5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.17
+ },
+ "car_회색_그랜저": {
+  "text": "회색 그랜저 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.81
+ },
+ "car_회색_EV6": {
+  "text": "회색 EV6 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.9
+ },
+ "car_회색_K8": {
+  "text": "회색 K8 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.93
+ },
+ "car_파란색_쏘나타": {
+  "text": "파란색 쏘나타 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.0
+ },
+ "car_파란색_K5": {
+  "text": "파란색 K5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.17
+ },
+ "car_파란색_아이오닉 5": {
+  "text": "파란색 아이오닉 5 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.31
+ },
+ "car_파란색_그랜저": {
+  "text": "파란색 그랜저 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.95
+ },
+ "car_파란색_EV6": {
+  "text": "파란색 EV6 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 2.98
+ },
+ "car_파란색_K8": {
+  "text": "파란색 K8 차량이에요.",
+  "voice": "ko-KR-SunHiNeural",
+  "sec": 3.0
+ }
+}

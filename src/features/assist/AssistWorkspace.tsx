@@ -1,7 +1,7 @@
 // 상담원 보조 화면 (기본 시나리오).
 // 고객이 한 말 → AI가 출발지·목적지를 정리(제안) → 상담원이 확인·수정 → 고객 최종 확인 → Playwright가 콘솔에 입력·호출
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { AlertTriangle, Check, Mic, Play, RotateCcw, Send, Sparkles, UserCheck } from 'lucide-react'
+import { AlertTriangle, Check, Mic, Pause, Play, RotateCcw, Send, Sparkles, UserCheck, Volume2, VolumeX } from 'lucide-react'
 import { OperatorPanel, type OrderView } from '../call/OperatorPanel'
 import { PLACES, findPlace, type Place } from '../dialog/places'
 import { speakPlate, withRo } from '../dialog/speech-format'
@@ -10,6 +10,7 @@ import { LISTEN_ERROR_TEXT, listenOnce, sttSupported, type ListenError } from '.
 import { extract, type Slot } from './extract'
 import { SAMPLE_CALLS } from './samples'
 import { useWorkerJob } from './useWorkerJob'
+import { clipText, DemoAudio } from './demoAudio'
 
 interface Choice {
   place: Place | null
@@ -103,7 +104,7 @@ function SlotCard({
   )
 }
 
-export function AssistWorkspace() {
+export function AssistWorkspace({ autoDemo = false }: { autoDemo?: boolean }) {
   const [utterances, setUtterances] = useState<string[]>([])
   const [sampleId, setSampleId] = useState<string | null>(null)
   const [pendingLines, setPendingLines] = useState<string[]>([])
@@ -120,6 +121,90 @@ export function AssistWorkspace() {
   const job = useWorkerJob()
 
   const ex = useMemo(() => extract(utterances), [utterances])
+
+  // ---------- 자동 시연 ----------
+  const [demo, setDemo] = useState<'ready' | 'running' | 'paused' | 'done'>('ready')
+  const [caption, setCaption] = useState<{ who: '상담원' | '고객'; text: string } | null>(null)
+  const [muted, setMuted] = useState(false)
+  const player = useRef<DemoAudio | null>(null)
+  useEffect(() => () => player.current?.stop(), [])
+
+  async function runDemo() {
+    player.current?.stop()
+    const p = new DemoAudio()
+    p.muted = muted
+    player.current = p
+    reset()
+    setSampleId(null)
+    setDemo('running')
+    const say = async (id: string, utter = false) => {
+      const who = id.startsWith('u') ? '고객' : '상담원'
+      setCaption({ who, text: clipText(id) })
+      if (utter) setUtterances((u) => [...u, clipText(id).replace(/\.$/, '')])
+      const ok = await p.play(id)
+      return ok && (await p.wait(250))
+    }
+    const step = (ms: number) => p.wait(ms)
+    if (!(await step(600))) return
+    if (!(await say('c1'))) return
+    if (!(await say('u1', true))) return
+    if (!(await say('u2', true))) return
+    setCaption({ who: '상담원', text: 'AI가 출발지는 서울역, 목적지는 후보 2곳으로 정리했어요.' })
+    if (!(await step(1800))) return
+    if (!(await say('c2'))) return
+    if (!(await say('u3', true))) return
+    const sev = findPlace('severance')!
+    setDestination({ place: sev, confirmed: false, edited: false })
+    setCaption({ who: '상담원', text: '후보에서 신촌세브란스병원을 고르고 두 곳을 확인해요.' })
+    if (!(await step(900))) return
+    setOrigin((c) => ({ ...c, place: c.place ?? findPlace('seoul-station')!, confirmed: true }))
+    if (!(await step(700))) return
+    setDestination((c) => ({ ...c, confirmed: true }))
+    if (!(await step(800))) return
+    if (!(await say('c3'))) return
+    if (!(await say('u4', true))) return
+    setApproved(true)
+    if (!(await step(500))) return
+    setCaption({ who: '상담원', text: '승인을 받았어요. Playwright가 호출 콘솔에 입력해요.' })
+    const dispatched = job.dispatch('seoul-station', 'severance', true)
+    if (!(await say('c4'))) return
+    const r = await dispatched
+    setResult(r)
+    if (!(await p.gate())) return
+    if (r?.status === 'assigned') {
+      if (!(await say('r_ok'))) return
+      if (!(await say(`eta${Math.min(9, Math.max(1, r.etaMinutes))}`))) return
+      setCaption({ who: '상담원', text: `차 번호는 ${r.plate}이에요.` })
+      await p.play('r_plate')
+      const m = r.plate.replace(/\s/g, '').match(/^(\d+)([가-힣])(\d+)$/)
+      if (m) {
+        for (const d of m[1]) if (!(await p.play(`d${d}`))) return
+        await p.wait(180)
+        await p.play(`h_${m[2]}`)
+        await p.wait(180)
+        for (const d of m[3]) if (!(await p.play(`d${d}`))) return
+      }
+      await p.play('r_end')
+      if (!(await say(`car_${r.color}_${r.model}`))) return
+    } else {
+      if (!(await say('r_none'))) return
+    }
+    if (!(await say('u5'))) return
+    setCaption(null)
+    setDemo('done')
+  }
+
+  function toggleDemoPause() {
+    const p = player.current
+    if (!p) return
+    if (demo === 'running') {
+      p.pause()
+      setDemo('paused')
+    } else if (demo === 'paused') {
+      p.resume()
+      setDemo('running')
+    }
+  }
 
   // AI 제안이 바뀌면, 상담원이 아직 확인하지 않은 칸만 따라 바꾼다
   useEffect(() => {
@@ -206,7 +291,50 @@ export function AssistWorkspace() {
   }
 
   return (
-    <div className="grid gap-3 lg:h-[calc(100dvh-112px)] lg:min-h-[640px] lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+    <div className="space-y-3">
+    {autoDemo && (
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-surface px-4 py-3" data-testid="demo-bar" data-state={demo}>
+        <button
+          type="button"
+          onClick={() => (demo === 'running' || demo === 'paused' ? toggleDemoPause() : void runDemo())}
+          data-testid="demo-play"
+          className="flex h-10 items-center gap-1.5 rounded-full bg-accent px-4 font-display text-sm font-bold text-white"
+        >
+          {demo === 'running' ? <Pause size={16} /> : <Play size={16} />}
+          {demo === 'ready' ? '자동 시연 시작' : demo === 'running' ? '일시정지' : demo === 'paused' ? '이어서 보기' : '다시 보기'}
+        </button>
+        {(demo === 'running' || demo === 'paused') && (
+          <button type="button" onClick={() => void runDemo()} className="flex h-10 items-center gap-1 rounded-full border border-line px-3 text-sm font-bold">
+            <RotateCcw size={14} /> 처음부터
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            setMuted((m) => !m)
+            if (player.current) player.current.muted = !muted
+          }}
+          aria-label={muted ? '소리 켜기' : '소리 끄기'}
+          data-testid="demo-mute"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-line"
+        >
+          {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+        </button>
+        <p className="min-w-0 flex-1 text-[15px]" data-testid="demo-caption" aria-live="polite">
+          {caption ? (
+            <>
+              <span className={`mr-2 rounded-md px-1.5 py-0.5 text-xs font-bold ${caption.who === '고객' ? 'bg-ink text-white' : 'bg-accent-soft text-accent-strong'}`}>{caption.who}</span>
+              {caption.text}
+            </>
+          ) : demo === 'done' ? (
+            <span className="text-muted">시연이 끝났어요. 실제 Playwright 실행 결과예요.</span>
+          ) : (
+            <span className="text-muted">소리가 나요 · 약 1분 · 목소리는 AI 합성음, 배차는 Mock</span>
+          )}
+        </p>
+      </div>
+    )}
+    <div className={`grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] ${autoDemo ? 'lg:h-[calc(100dvh-180px)] lg:min-h-[620px]' : 'lg:h-[calc(100dvh-112px)] lg:min-h-[640px]'}`}>
       <section className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-line bg-surface" aria-label="상담원 보조 화면" data-testid="assist-panel" onPointerUpCapture={(e) => {
           // 상담원이 직접 한 조작만 센다 (예시 통화 재생·받아쓰기처럼 고객 쪽을 흉내 내는 버튼은 제외)
           const el = (e.target as HTMLElement).closest('button,select,input[type=checkbox]')
@@ -353,6 +481,7 @@ export function AssistWorkspace() {
           idleText="Playwright가 서버의 Chromium으로 호출 콘솔을 열고, 확인된 출발지·목적지를 검색해 고르고, 위치 확인과 승인 체크를 한 뒤 호출 버튼을 눌러요. 상담원은 결과만 읽어 주면 돼요."
         />
       </div>
+    </div>
     </div>
   )
 }

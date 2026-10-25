@@ -1,10 +1,10 @@
 // 공개 첫 페이지: 시연 영상 + 왜 만들었나 + 무엇이 바뀌나 + ROI로 정한 다음 단계 + 확인한 것/못 한 것
 import { Check, X } from 'lucide-react'
-import demo from '../../../public/media/demo.json'
 import holdout from '../../data/experiment-extraction-holdout.json'
 import worker from '../../data/experiment-worker.json'
 import actions from '../../data/experiment-actions.json'
 import { calculateAssist, DEFAULT_ASSIST } from '../roi/assist-roi'
+import { AssistWorkspace } from '../assist/AssistWorkspace'
 
 const roi = calculateAssist(DEFAULT_ASSIST)
 const manualRange = `${Math.min(...actions.rows.map((r) => r.manual))}~${Math.max(...actions.rows.map((r) => r.manual))}`
@@ -30,7 +30,7 @@ export function ShowcasePage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1040px] space-y-14 px-4 py-10">
+      <main className="mx-auto max-w-[1040px] px-4 pb-6 pt-10">
         <section>
           <h1 className="font-display text-[28px] font-bold leading-tight sm:text-[36px]">
             택시 대신 불러주기,
@@ -42,18 +42,15 @@ export function ShowcasePage() {
             <li>호출 화면 입력은 Playwright가 해요.</li>
             <li>확인과 승인은 상담원이 해요.</li>
           </ul>
-          <figure className="mt-6">
-            <video src="/media/demo.mp4" poster="/media/demo-poster.jpg" controls playsInline preload="metadata" className="w-full rounded-xl border border-line bg-ink" data-testid="demo-video" />
-            <figcaption className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted">
-              <span>{demo.seconds}초</span>
-              <span>실제 화면 녹화</span>
-              <span>목소리는 AI 합성음</span>
-              <span>지도는 OpenStreetMap</span>
-              <span>배차는 Mock</span>
-            </figcaption>
-          </figure>
-        </section>
 
+        </section>
+      </main>
+
+      <section className="mx-auto max-w-[1400px] px-3 sm:px-4" aria-label="자동 시연" data-testid="auto-demo">
+        <AssistWorkspace autoDemo />
+      </section>
+
+      <main className="mx-auto max-w-[1040px] space-y-14 px-4 py-12">
         <section>
           <H2>왜 만들었나</H2>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
