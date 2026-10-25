@@ -1,22 +1,12 @@
-// 공개 페이지 점검용 스크린샷 (headless)
+// 공개 첫 페이지 점검용 스크린샷 (headless)
 import { chromium } from '@playwright/test'
 const base = process.env.BASE ?? 'https://ai-taxi-114-agent.vercel.app'
 const out = process.argv[2] ?? '.'
 const b = await chromium.launch()
-const p = await b.newPage({ viewport: { width: 1440, height: 900 } })
-await p.goto(base, { waitUntil: 'networkidle' })
-await p.getByTestId('sample-c17').click()
-await p.getByText('모두 보기').click()
-await p.getByTestId('pick-destination-severance').click()
-await p.getByTestId('confirm-origin').click()
-await p.getByTestId('confirm-destination').click()
-await p.getByTestId('assist-approved').check()
-await p.screenshot({ path: `${out}/p1-assist.png` })
-await p.getByTestId('assist-run').click()
-await p.getByTestId('assist-result').waitFor({ timeout: 60_000 })
-await p.waitForTimeout(800)
-await p.screenshot({ path: `${out}/p2-assist-done.png` })
-await p.goto(`${base}/#results`, { waitUntil: 'networkidle' })
-await p.locator('#results').screenshot({ path: `${out}/p3-results.png` })
-await p.locator('#compare').screenshot({ path: `${out}/p4-compare.png` })
+for (const [name, vp] of [['desktop', { width: 1280, height: 860 }], ['mobile', { width: 390, height: 844 }]] as const) {
+  const p = await b.newPage({ viewport: vp })
+  await p.goto(base, { waitUntil: 'networkidle' })
+  await p.screenshot({ path: `${out}/home-${name}.png`, fullPage: true })
+  console.log(name, 'overflow', await p.evaluate(() => document.documentElement.scrollWidth - innerWidth))
+}
 await b.close()
