@@ -72,3 +72,9 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* 지도 글자도 웹폰트로 (서버 Chromium에는 한글 글꼴이 없다) */
+.leaflet-container,
+.leaflet-tooltip {
+  font-family: var(--font-sans);
+}
