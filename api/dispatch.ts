@@ -1,5 +1,5 @@
 // Vercel Function: POST /api/dispatch — Mock 배차. 실제 택시를 부르지 않는다.
-import { createDispatchService } from '../server/dispatch-core'
+import { createDispatchService } from '../server/dispatch-core.js'
 
 const service = createDispatchService({ disabled: process.env.DISPATCH_DISABLED === '1' })
 

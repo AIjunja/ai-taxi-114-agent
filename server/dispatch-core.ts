@@ -1,6 +1,6 @@
 // Mock Dispatch. 실제 택시나 카카오 T를 호출하지 않는다.
 // 서버리스 인스턴스 메모리에만 잠깐 보관하고 아무것도 영구 저장하지 않는다.
-import { PLACE_IDS } from '../src/features/dialog/places'
+import { PLACE_IDS } from '../src/features/dialog/places.js'
 
 export interface DispatchRequest {
   sessionId: string

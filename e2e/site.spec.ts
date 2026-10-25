@@ -185,7 +185,7 @@ test('API 키와 내부 실행 정보가 공개 번들에 없다', async ({ page
   const scripts = await page.evaluate(() => [...document.scripts].map((s) => s.src).filter(Boolean))
   for (const src of scripts) {
     const body = await (await page.request.get(src)).text()
-    expect(body).not.toMatch(/sk-[A-Za-z0-9]{20}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{30}|VERCEL_TOKEN|DISPATCH_DISABLED/)
+    expect(body).not.toMatch(/sk-[A-Za-z0-9]{20}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{30}|eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}|VERCEL_OIDC_TOKEN|VERCEL_TOKEN/)
   }
   const health = await page.request.get('/api/dispatch')
   expect(await health.json()).toEqual({ ok: true, mock: true, disabled: false })
