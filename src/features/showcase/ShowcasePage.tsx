@@ -4,7 +4,8 @@ import holdout from '../../data/experiment-extraction-holdout.json'
 import worker from '../../data/experiment-worker.json'
 import actions from '../../data/experiment-actions.json'
 import { calculateAssist, DEFAULT_ASSIST } from '../roi/assist-roi'
-import { AssistWorkspace } from '../assist/AssistWorkspace'
+import { useState } from 'react'
+import { DemoCall, type Scenario } from '../demo/DemoCall'
 
 const roi = calculateAssist(DEFAULT_ASSIST)
 const manualRange = `${Math.min(...actions.rows.map((r) => r.manual))}~${Math.max(...actions.rows.map((r) => r.manual))}`
@@ -16,6 +17,7 @@ function H2({ children }: { children: string }) {
 }
 
 export function ShowcasePage() {
+  const [scenario, setScenario] = useState<Scenario>('assist')
   return (
     <div className="min-h-screen bg-bg">
       <header className="border-b border-line bg-surface">
@@ -30,14 +32,14 @@ export function ShowcasePage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1040px] px-4 pb-6 pt-10">
+      <main className="mx-auto max-w-[1040px] px-4 pb-5 pt-7">
         <section>
-          <h1 className="font-display text-[28px] font-bold leading-tight sm:text-[36px]">
+          <h1 className="font-display text-[26px] font-bold leading-tight sm:text-[32px]">
             택시 대신 불러주기,
             <br />
             상담원 조작 {actions.rows[0].manual}번을 {actions.rows[0].assisted}번으로
           </h1>
-          <ul className="mt-4 space-y-1 text-[16px] text-muted">
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[15px] text-muted">
             <li>고객 말은 AI가 정리해요.</li>
             <li>호출 화면 입력은 Playwright가 해요.</li>
             <li>확인과 승인은 상담원이 해요.</li>
@@ -47,7 +49,22 @@ export function ShowcasePage() {
       </main>
 
       <section className="mx-auto max-w-[1400px] px-3 sm:px-4" aria-label="자동 시연" data-testid="auto-demo">
-        <AssistWorkspace autoDemo />
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <div className="flex rounded-full bg-surface p-1 text-[13px] font-bold ring-1 ring-line" role="tablist" aria-label="시연 시나리오">
+            {(
+              [
+                ['assist', '상담원 + AI 보조 · 제안'],
+                ['full', 'AI 상담원 혼자 · 비교용'],
+              ] as const
+            ).map(([k, label]) => (
+              <button key={k} role="tab" aria-selected={scenario === k} onClick={() => setScenario(k)} data-testid={`scenario-${k}`} className={`whitespace-nowrap rounded-full px-3.5 py-1.5 transition-colors ${scenario === k ? 'bg-ink text-white' : 'text-muted hover:text-ink'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted">{scenario === 'assist' ? '사람 상담원이 말하고, AI는 장소 정리만 도와요' : 'AI가 혼자 묻고 확인하고 호출해요'} · 호출 화면 조작은 실제 Playwright</p>
+        </div>
+        <DemoCall scenario={scenario} />
       </section>
 
       <main className="mx-auto max-w-[1040px] space-y-14 px-4 py-12">

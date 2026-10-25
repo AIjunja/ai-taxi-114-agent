@@ -343,18 +343,22 @@ test('실험 결과와 보조 방식 비용 계산이 보인다', async ({ page 
 
 // 서버 Worker는 동시에 1개만 실행하므로, Worker를 쓰는 테스트는 차례로 돌린다
 test.describe.serial('Worker 실시간 실행', () => {
-  test('자동 시연: 버튼 하나로 대화 → 상담원 확인 → Playwright 호출 → 결과 안내까지 진행한다', async ({ page }, info) => {
-    test.skip(info.project.name !== 'desktop', '서버 Worker 실행 횟수를 아끼려고 데스크톱에서만')
-    await page.goto('/')
-    await page.getByTestId('demo-mute').click()
-    await page.getByTestId('demo-play').click()
-    await expect(page.getByTestId('demo-caption')).toContainText('어디서 타세요')
-    await expect(page.getByTestId('slot-destination')).toHaveAttribute('data-status', 'ambiguous', { timeout: 30_000 })
-    await expect(page.getByTestId('slot-destination')).toHaveAttribute('data-status', 'confirmed', { timeout: 30_000 })
-    await expect(page.getByTestId('worker-frame')).toBeVisible({ timeout: 60_000 })
-    await expect(page.getByTestId('assist-result')).toBeVisible({ timeout: 60_000 })
-    await expect(page.getByTestId('demo-bar')).toHaveAttribute('data-state', 'done', { timeout: 60_000 })
-  })
+  for (const scenario of ['assist', 'full'] as const) {
+    test(`자동 시연(${scenario}): 버튼 하나로 대화 → 승인 → Playwright 호출 → 결과 안내까지`, async ({ page }, info) => {
+      test.skip(info.project.name !== 'desktop', '서버 Worker 실행 횟수를 아끼려고 데스크톱에서만')
+      test.setTimeout(240_000)
+      const played: string[] = []
+      page.on('request', (r) => r.url().includes('/audio/demo2/') && played.push(r.url()))
+      await page.goto('/')
+      await page.getByTestId(`scenario-${scenario}`).click()
+      await page.getByTestId('demo-start').click()
+      await expect(page.getByTestId('transcript')).toContainText(scenario === 'assist' ? '어디서 타세요' : '잘 들리시면', { timeout: 15_000 })
+      await expect(page.getByTestId('worker-frame')).toBeVisible({ timeout: 120_000 })
+      await expect(page.getByTestId('dispatch-summary')).toBeVisible({ timeout: 60_000 })
+      await expect(page.getByTestId('demo-call')).toHaveAttribute('data-state', 'done', { timeout: 180_000 })
+      expect(played.length).toBeGreaterThan(10)
+    })
+  }
 
   test('음성 통화: 말하면 알아듣고 대답하고, 승인 전에는 호출하지 않는다', async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop', '서버 Worker 실행 횟수를 아끼려고 데스크톱에서만')
@@ -429,14 +433,17 @@ test.describe.serial('Worker 실시간 실행', () => {
 test('공개 첫 페이지: 자동 시연, 왜 만들었나, ROI 계획, 확인한 것과 못 한 것', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByTestId('poc-banner')).toContainText('실제 택시 호출 없음')
-  await expect(page.getByTestId('auto-demo').getByTestId('assist-panel')).toBeVisible()
-  await expect(page.getByTestId('demo-play')).toHaveText(/자동 시연 시작/)
+  await expect(page.getByTestId('auto-demo').getByTestId('demo-call')).toHaveAttribute('data-scenario', 'assist')
+  await expect(page.getByTestId('demo-start')).toBeVisible()
+  await page.getByTestId('scenario-full').click()
+  await expect(page.getByTestId('demo-call')).toHaveAttribute('data-scenario', 'full')
   await expect(page.getByRole('heading', { name: '왜 만들었나' })).toBeVisible()
   await expect(page.getByTestId('roi-tiles')).toContainText('건당 14초 절감')
   await expect(page.getByTestId('not-verified')).toContainText('실제 목소리 음성 인식')
   await expect(page.locator('video')).toHaveCount(0)
-  const clip = await page.request.get('/audio/demo/c1.mp3')
-  expect(clip.ok()).toBe(true)
+  const manifest = await (await page.request.get('/audio/demo2/manifest.json')).json()
+  const first = Object.keys(manifest.clips)[0]
+  expect((await page.request.get(`/audio/demo2/${first}.mp3`)).ok()).toBe(true)
 })
 
 test('호출 콘솔은 실제 지도에 위치를 찍는다', async ({ page }) => {

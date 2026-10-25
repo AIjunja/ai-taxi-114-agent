@@ -10,6 +10,11 @@ export function clipText(id: string): string {
 
 export class DemoAudio {
   private audio: HTMLAudioElement | null = null
+  /** 클립 폴더와 길이 표. 기본값은 상담원 보조 화면용 클립이다. */
+  constructor(
+    private base = '/audio/demo',
+    private seconds: (id: string) => number | undefined = (id) => CLIPS[id]?.sec,
+  ) {}
   private paused = false
   muted = false
   stopped = false
@@ -48,10 +53,11 @@ export class DemoAudio {
   /** 클립 하나를 끝까지 재생한다. 소리를 끄면 같은 시간만큼 기다린다. */
   async play(id: string): Promise<boolean> {
     if (!(await this.gate())) return false
-    const clip = CLIPS[id]
-    if (!clip) return true
+    const sec = this.seconds(id)
+    if (sec === undefined) return true
+    const clip = { sec }
     if (this.muted) return this.wait(clip.sec * 1000)
-    const a = new Audio(`/audio/demo/${encodeURIComponent(id)}.mp3`)
+    const a = new Audio(`${this.base}/${encodeURIComponent(id)}.mp3`)
     this.audio = a
     await new Promise<void>((resolve) => {
       const done = () => resolve()
@@ -68,7 +74,7 @@ export class DemoAudio {
       setTimeout(() => {
         clearInterval(guard)
         done()
-      }, clip.sec * 1000 + 60_000)
+      }, clip.sec * 1000 + 3000)
     })
     this.audio = null
     return !this.stopped
