@@ -39,8 +39,8 @@ export interface RunOptions {
   timeoutMs?: number
 }
 
-// 정적 글꼴만 예외로 허용한다.
-const ASSET_HOSTS = ['cdn.jsdelivr.net']
+// 정적 글꼴과 지도 타일만 예외로 허용한다.
+const ASSET_HOSTS = ['cdn.jsdelivr.net', 'tile.openstreetmap.org']
 const MAX_ATTEMPTS = 2
 
 let running = 0
@@ -130,7 +130,10 @@ async function choosePlace(page: Page, kind: 'origin' | 'destination', placeId: 
   await wait()
   await option.click()
   step(`${label} 선택`, name)
-  await wait()
+  // 실제 지도가 그 장소로 이동하고 핀이 찍히는지 보고 위치를 확인한다
+  await page.locator('[data-testid="real-map"] .leaflet-marker-icon').first().waitFor({ timeout: 5000 })
+  await wait(900)
+  step(`${label} 지도 확인`, `${name} 위치에 핀`)
   await page.getByTestId(`console-${kind}-confirm`).click()
   await page.getByTestId(`console-${kind}-confirmed`).waitFor({ timeout: 3000 })
   step(`${label} 위치 확인`)

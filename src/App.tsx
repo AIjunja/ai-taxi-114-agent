@@ -12,6 +12,7 @@ import { TechSection } from './features/tech/TechSection'
 import { CompareSection } from './features/report/CompareSection'
 import { ResultsSection } from './features/report/ResultsSection'
 import { DecisionSection } from './features/report/DecisionSection'
+import { ShowcasePage } from './features/showcase/ShowcasePage'
 
 type Mode = 'assist' | 'auto' | 'demo'
 
@@ -54,7 +55,7 @@ function Home() {
     <>
       <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-3 px-4">
-          <a href="/" className="flex shrink-0 items-center gap-2">
+          <a href="/lab" className="flex shrink-0 items-center gap-2">
             <span className="flex h-7 w-10 items-center justify-center rounded-md bg-accent font-display text-[13px] font-bold text-white">114</span>
             <span className="hidden font-display text-[15px] font-bold xl:inline">상담원 반복 업무 줄이기 PoC</span>
           </a>
@@ -141,5 +142,7 @@ function Home() {
 export function App() {
   if (window.location.pathname.startsWith('/console')) return <ConsolePage />
   if (window.location.pathname.startsWith('/diagnostics')) return <VoiceDiagnostics />
-  return <Home />
+  // 직접 조작해 보는 화면은 링크 없이 /lab 에 남겨 둔다. 공개 첫 화면은 시연 영상 페이지다.
+  if (window.location.pathname.startsWith('/lab')) return <Home />
+  return <ShowcasePage />
 }

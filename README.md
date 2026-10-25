@@ -3,7 +3,9 @@
 02-114 '택시 대신 불러주기'에서 **상담원의 반복 업무(받아 적기·검색 입력·호출 화면 조작·결과 안내)를 얼마나 줄일 수 있는지** 검증하는 개인 PoC예요.
 KT IS의 공식 사업이 아니고, 실제 택시 호출·결제·카카오 T 연동은 하지 않아요.
 
-- 공개 데모: https://ai-taxi-114-agent.vercel.app
+- 공개 페이지 (시연 영상): https://ai-taxi-114-agent.vercel.app
+- 직접 조작 화면 (링크 없이 유지): `/lab` · 호출 콘솔: `/console` · 음성 진단: `/diagnostics`
+- 시연 영상 만들기: `npx tsx scripts/make-demo-video.ts` (로컬 서버, ffmpeg, 이 PC의 OPENAI_API_KEY 필요. 키는 사이트에 올리지 않아요)
 - 판단 기록: [docs/decision-log.md](docs/decision-log.md) · 면접 메모: [docs/interview-qa.md](docs/interview-qa.md)
 
 ## 기본 시나리오: 상담원 보조
@@ -25,7 +27,7 @@ KT IS의 공식 사업이 아니고, 실제 택시 호출·결제·카카오 T �
 | 공개 서버 Playwright 입력·호출 | 6/6 성공, 평균 11.6초. 동시 실행 제한은 인스턴스마다라 **실패** |
 | 상담원 조작 수 | 수동 13~18회 → 보조 4~5회 (시간은 재지 못함) |
 | 음성 인식 | **검증 실패** — Chrome(자동화) 결과 없음, Edge network 오류, 사용자 직접 시도 실패 |
-| 음성 합성 | 기기 합성음 1개. 사람 수준이라고 주장하지 않음 |
+| 음성 합성 | 사이트 안: 기기 합성음 1개(사람 수준 주장 안 함). 시연 영상: OpenAI TTS로 미리 만든 음성 |
 | 자동 테스트 | 단위 63, E2E 로컬 41, E2E 공개 URL 40 통과 |
 
 발화 데이터는 직접 만든 예시예요(실제 녹취 아님).
@@ -39,7 +41,9 @@ src/features/call       완전 자동 음성 통화, 업무 자동화 패널
 src/features/console    Mock 택시 호출 콘솔 (Playwright가 조작하는 화면)
 src/features/diagnostics 음성 진단 (/diagnostics)
 src/features/roi        비용 계산: assist-roi.ts(기본), roi.ts(완전 자동 대체, 참고)
-src/features/report     적용 전후·실험 결과·판단 기록
+src/features/report     적용 전후·실험 결과·판단 기록 (/lab)
+src/features/showcase   공개 첫 페이지 (시연 영상)
+src/components/RealMap  실제 지도 (Leaflet + OpenStreetMap)
 server/                 Mock 배차, Worker 공통 코드
 api/                    Vercel Functions (/api/dispatch, /api/worker)
 scripts/                실험·녹화·진단 스크립트

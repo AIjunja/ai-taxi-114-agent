@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Check, Loader2, Lock, MonitorPlay, Radio } from 'lucide-react'
-import { MiniMap } from '../../components/MiniMap'
+import { RealMap } from '../../components/RealMap'
 import type { DialogState } from '../dialog/machine'
 import type { Place } from '../dialog/places'
 import type { WorkerView } from './useCall'
@@ -64,7 +64,7 @@ function WorkOrder({ order }: { order: OrderView }) {
           state={order.approval === 'done' ? 'done' : order.approval === 'pending' ? 'pending' : 'locked'}
         />
       </div>
-      <MiniMap origin={order.origin} destination={order.destination} pending={order.pin ?? null} height={186} />
+      <RealMap origin={order.origin} destination={order.destination} pending={order.pin ?? null} height={186} />
     </div>
   )
 }

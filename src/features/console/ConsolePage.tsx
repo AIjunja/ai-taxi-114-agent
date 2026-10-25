@@ -3,7 +3,8 @@
 // 실제 카카오 T나 택시를 호출하지 않는다.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Car, Check, ClipboardList, History, LayoutGrid, MapPin, Phone, Search, Settings, X } from 'lucide-react'
-import { MiniMap, distanceKm, driverPosition } from '../../components/MiniMap'
+import { distanceKm, driverPosition } from '../../components/MiniMap'
+import { RealMap } from '../../components/RealMap'
 import { cancelCall, createCall, getStatus, randomId, type DispatchStatus } from '../../lib/dispatch-client'
 import { findPlace, normalize, PLACES, resolvePlaces, type Place } from '../dialog/places'
 
@@ -410,7 +411,7 @@ export function ConsolePage() {
           </div>
 
           <div className="flex min-w-0 flex-col gap-3">
-            <MiniMap origin={originOk ? origin : null} destination={destOk ? destination : null} pending={!originOk ? origin : !destOk ? destination : null} driver={driver} height={210} />
+            <RealMap origin={originOk ? origin : null} destination={destOk ? destination : null} pending={!originOk ? origin : !destOk ? destination : null} driver={driver} height={230} />
 
             <ol className="grid grid-cols-5 gap-1 rounded-lg border border-line bg-surface p-2" data-testid="console-steps">
               {STEPS.map((s, i) => (
