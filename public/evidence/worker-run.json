@@ -1,0 +1,91 @@
+{
+  "recordedAt": "2026-10-25T09:49:19.624Z",
+  "environment": "로컬 개발 서버 (win32, Playwright 1.64.1)",
+  "video": "/evidence/worker-run.webm",
+  "poster": "/evidence/worker-run.jpg",
+  "steps": [
+    {
+      "t": 0,
+      "action": "브라우저 실행",
+      "detail": "Chromium"
+    },
+    {
+      "t": 937,
+      "action": "호출 콘솔 열기",
+      "detail": "/console"
+    },
+    {
+      "t": 1602,
+      "action": "출발지 검색",
+      "detail": "서울역"
+    },
+    {
+      "t": 1962,
+      "action": "출발지 선택",
+      "detail": "서울역"
+    },
+    {
+      "t": 2322,
+      "action": "출발지 위치 확인"
+    },
+    {
+      "t": 3456,
+      "action": "목적지 검색",
+      "detail": "신촌세브란스병원"
+    },
+    {
+      "t": 3806,
+      "action": "목적지 선택",
+      "detail": "신촌세브란스병원"
+    },
+    {
+      "t": 4155,
+      "action": "목적지 위치 확인"
+    },
+    {
+      "t": 4503,
+      "action": "고객 최종 승인 체크",
+      "detail": "대화에서 승인 받음"
+    },
+    {
+      "t": 4853,
+      "action": "택시 호출 버튼 클릭",
+      "detail": "1번째 시도"
+    },
+    {
+      "t": 5660,
+      "action": "오류 감지",
+      "detail": "배차 서버 응답이 늦어요. 잠시 뒤 다시 눌러 주세요. (시험용으로 넣은 오류)"
+    },
+    {
+      "t": 5660,
+      "action": "복구",
+      "detail": "1초 기다린 뒤 다시 시도"
+    },
+    {
+      "t": 6688,
+      "action": "택시 호출 버튼 클릭",
+      "detail": "2번째 시도"
+    },
+    {
+      "t": 6718,
+      "action": "배차 대기",
+      "detail": "주변 택시에 호출 중"
+    },
+    {
+      "t": 12075,
+      "action": "결과 읽기",
+      "detail": "기사 이*수 · 49가 6524 · 6분"
+    }
+  ],
+  "durationMs": 12977,
+  "result": {
+    "status": "assigned",
+    "requestId": "recorded",
+    "plate": "49가 6524",
+    "etaMinutes": 6,
+    "color": "회색",
+    "model": "쏘나타",
+    "driverName": "이*수"
+  }
+}

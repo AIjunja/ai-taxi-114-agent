@@ -1,130 +1,79 @@
 import { ArrowRight, ExternalLink } from 'lucide-react'
-import { Badge, Panel } from '../../components/ui'
 import report from '../../data/test-report.json'
 
-const FLOW_BEFORE = ['고객이 02-114로 전화', '상담원이 출발지·목적지를 듣고 받아 적기', '상담원이 카카오 T로 대신 호출', '배차 결과를 고객에게 안내']
-const FLOW_AFTER = [
-  ['AI 상담원이 전화 받기', '음성 인식 → 대화 관리'],
-  ['출발지·목적지를 되읽어 확인', '고객이 맞다고 할 때만 확정'],
-  ['최종 승인 받기', "'네' 전에는 호출 잠금"],
-  ['Playwright가 업무 웹 조작', '사람이 하던 입력과 클릭을 대신'],
-  ['배차 결과를 음성으로 안내', '한 줄씩 끊어서'],
-  ['실패하면 상담원에게 넘기기', '사람이 이어서 처리'],
+const PIPELINE: { label: string; tech: string; where: string }[] = [
+  { label: '듣기 (STT)', tech: 'Web Speech API · SpeechRecognition', where: '방문자 브라우저' },
+  { label: '알아듣기', tech: '규칙 기반 대화 엔진', where: '방문자 브라우저' },
+  { label: '말하기 (TTS)', tech: 'Web Speech API · speechSynthesis', where: '방문자 브라우저' },
+  { label: '콘솔 조작', tech: 'Playwright + 서버 Chromium', where: 'Vercel Function' },
+  { label: '배차', tech: 'Mock Dispatch API', where: 'Vercel Function' },
 ]
 
-const STACK: { name: string; solves: string; status: '사용' | '후보' }[] = [
-  { name: 'React 18 + TypeScript + Vite', solves: '시연·체험·업무 웹을 한 코드로 만들고 대화 상태 타입을 컴파일 단계에서 검사해요.', status: '사용' },
-  { name: '규칙 기반 대화 엔진 (machine.ts)', solves: '확인·승인 단계를 건너뛸 수 없게 해요. 순수 함수라서 자동 시연과 체험이 같은 로직을 쓰고 테스트하기 쉬워요.', status: '사용' },
-  { name: 'Web Speech API', solves: '서버 키 없이 브라우저에서 음성 인식·합성을 해요. 공개 데모에서 키가 새어 나갈 일이 없어요.', status: '사용' },
-  { name: 'Playwright', solves: '상담원 업무 웹 입력·클릭을 자동화하고, 같은 도구로 E2E 테스트와 실행 녹화를 남겨요.', status: '사용' },
-  { name: 'Vercel Functions', solves: 'Mock 배차 API를 서버에 두고 승인 검사, 중복 방지, 요청량 제한을 해요.', status: '사용' },
-  { name: 'Radix UI · Tailwind CSS', solves: '슬라이더·스위치·탭을 키보드와 화면 낭독기로도 쓸 수 있게 해요.', status: '사용' },
-  { name: 'Recharts · Motion', solves: '성공률별 비용 그래프와 말풍선 등장처럼 꼭 필요한 움직임만 넣어요.', status: '사용' },
-  { name: 'Vitest', solves: '대화 흐름, 비용 계산, 배차 API 규칙을 단위 테스트로 고정해요.', status: '사용' },
-  { name: '상용 STT·TTS (전화 음질용)', solves: '8kHz 전화 음성과 사투리·어르신 발화 인식률을 높여요.', status: '후보' },
-  { name: 'LLM 기반 발화 이해', solves: '"병원 앞 편의점" 같은 자유 발화를 장소 후보로 바꿔요. 확정은 지금처럼 규칙 엔진이 해요.', status: '후보' },
-  { name: '지오코딩·POI 검색 API', solves: '24곳 데모 목록 대신 전국 장소를 찾아요.', status: '후보' },
-  { name: '전화망 연동 (SIP·IVR)', solves: '실제 02-114 통화를 AI 상담원에게 연결해요.', status: '후보' },
-  { name: '배차 플랫폼 공식 API', solves: '화면 자동화 대신 제휴 API로 호출해요. 제휴가 없으면 화면 자동화가 대안이에요.', status: '후보' },
+const STACK: { name: string; role: string; status: '사용' | '후보' }[] = [
+  { name: 'STT · Web Speech API (SpeechRecognition)', role: '고객이 한 말을 문장으로 바꿔요. 말하는 동안 중간 인식 결과를 보여줘요. Chrome·Edge에서는 브라우저 회사의 음성 인식 서버를 거쳐요.', status: '사용' },
+  { name: 'TTS · Web Speech API (speechSynthesis)', role: '답변을 기기의 한국어 음성으로 읽어요. 문장마다 쉬고, 천천히 말하기·소리 크기·다시 듣기를 지원해요.', status: '사용' },
+  { name: 'AI 대화 엔진 (규칙 기반 상태 기계)', role: '장소 인식, 후보 제시, 되읽기, 수정, 취소, 상담원 연결을 처리해요. 호출은 최종 승인 단계에서만 나가게 막아요. 언어 모델은 쓰지 않았어요.', status: '사용' },
+  { name: 'Playwright + @sparticuz/chromium', role: '서버에서 Chromium을 띄워 택시 호출 콘솔에 실제로 입력하고 클릭해요. 화면은 CDP 스크린캐스트로 실시간 전송해요.', status: '사용' },
+  { name: 'Mock Dispatch API (Vercel Functions)', role: '호출 접수 → 배차 대기 → 기사 배정 → 취소를 흉내 내요. 승인 검사, 중복 요청 방지, 요청량 제한을 해요. 요청 ID에 서명을 넣어 상태를 저장 없이 계산해요.', status: '사용' },
+  { name: '택시 호출 콘솔 (Mock 업무 웹)', role: '호출 담당자가 쓰는 화면을 가정해 만들었어요. 실제 카카오모빌리티 화면을 본 적은 없고, 복제하지 않았어요.', status: '사용' },
+  { name: 'React · TypeScript · Vite · Tailwind · Radix · Recharts · Motion', role: '화면 구성, 접근성 있는 조작 부품, 비용 그래프, 말풍선 전환에 썼어요.', status: '사용' },
+  { name: 'Vitest · Playwright Test', role: '대화 흐름과 배차 규칙은 단위 테스트로, 화면 흐름은 공개 URL에서 E2E로 확인해요.', status: '사용' },
+  { name: 'LLM 발화 이해 (OpenAI·Gemini 등)', role: '"병원 앞 편의점" 같은 자유로운 말을 장소 후보로 바꿀 수 있어요. 공개 데모는 API 비용과 키 관리 때문에 넣지 않았어요.', status: '후보' },
+  { name: '전화 음질용 상용 STT·TTS', role: '8kHz 전화 음성과 어르신 발화, 사투리 인식률을 높여요.', status: '후보' },
+  { name: '전화망 연동 (SIP·IVR)', role: '실제 02-114 통화를 AI 상담원에게 연결해요.', status: '후보' },
+  { name: '지오코딩·POI 검색', role: '데모 장소 29곳 대신 전국 주소와 건물을 찾아요.', status: '후보' },
+  { name: '배차 플랫폼 공식 API', role: '화면 자동화 대신 제휴 API로 호출해요. 화면이 바뀌어도 깨지지 않아요.', status: '후보' },
 ]
-
-function Block({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h3 className="text-lg font-bold">{title}</h3>
-      <div className="mt-3">{children}</div>
-    </div>
-  )
-}
 
 export function TechSection() {
   return (
-    <div className="space-y-14">
-      <Block title="문제를 발견한 배경">
-        <div className="grid gap-4 md:grid-cols-[1.3fr_1fr]">
-          <div className="space-y-3 text-[15px] leading-relaxed">
-            <p>
-              KT IS는 2025년 4월부터 02-114로 전화하면 상담원이 카카오 T 택시를 대신 불러주는 서비스를 운영하고 있어요. 앱을 쓰기 어려운 어르신을 위한 서비스예요.
-            </p>
-            <p>
-              공개 기사 기준 누적 약 15만 건, 이용자 약 6만 명이에요. 운영 시간은 오전 8시부터 오후 7시까지예요. 호출 한 건은 듣고, 확인하고, 앱에 입력하는 같은 순서를 반복해요.
-            </p>
-            <p className="font-semibold">그래서 정해진 순서는 AI와 자동화가 맡고, 사람은 AI가 못 푼 통화에 집중하는 구조를 제안했어요.</p>
-          </div>
-          <Panel className="p-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Badge tag="공개 자료" />
-              <span className="text-muted">전자신문 2026년 8월 7일</span>
-            </div>
-            <dl className="mt-3 space-y-1.5">
-              {[
-                ['출시', '2025년 4월'],
-                ['누적 이용', '약 15만 건'],
-                ['누적 이용자', '약 6만 명'],
-                ['운영 시간', '매일 08:00~19:00'],
-              ].map(([k, v]) => (
-                <div key={k} className="flex justify-between">
-                  <dt className="text-muted">{k}</dt>
-                  <dd className="num font-semibold">{v}</dd>
+    <div className="space-y-12">
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.3fr]">
+        <div className="space-y-3 text-[15px] leading-relaxed">
+          <h3 className="font-display text-lg font-bold">왜 만들었나</h3>
+          <p>KT IS는 2025년 4월부터 02-114로 전화하면 상담원이 카카오 T 택시를 대신 불러주는 서비스를 운영해요. 공개 기사 기준 누적 약 15만 건, 이용자 약 6만 명이에요.</p>
+          <p>호출 한 건은 '듣고, 되묻고, 앱에 입력하고, 결과를 읽어 주는' 같은 순서예요. 이 PoC는 그 순서를 AI 상담원과 화면 자동화가 맡고, 사람은 AI가 못 푼 통화를 맡는 구조를 보여줘요.</p>
+          <a href="https://www.etnews.com/20260807000116" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-bold text-accent underline underline-offset-2">
+            전자신문 2026년 8월 7일 기사 <ExternalLink size={13} />
+          </a>
+        </div>
+        <div>
+          <h3 className="font-display text-lg font-bold">한 통화가 처리되는 길</h3>
+          <ol className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+            {PIPELINE.map((p, i) => (
+              <li key={p.label} className="flex flex-1 items-center gap-2">
+                <div className="flex-1 rounded-lg border border-line bg-bg p-3">
+                  <p className="text-[11px] font-bold text-muted">{p.where}</p>
+                  <p className="mt-0.5 font-display text-sm font-bold">{p.label}</p>
+                  <p className="mt-0.5 text-xs text-muted">{p.tech}</p>
                 </div>
-              ))}
-            </dl>
-            <a href="https://www.etnews.com/20260807000116" target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 font-semibold text-accent underline underline-offset-2">
-              기사 원문 <ExternalLink size={13} />
-            </a>
-          </Panel>
+                {i < PIPELINE.length - 1 && <ArrowRight size={14} className="hidden shrink-0 text-muted sm:block" aria-hidden />}
+              </li>
+            ))}
+          </ol>
+          <p className="mt-2 text-xs text-muted">공개 사이트에서 서버 Worker를 쓸 수 없을 때(동시 실행·요청량 제한, 오류)는 배차 API로 직접 호출하고, 화면에 그 사실을 표시해요.</p>
         </div>
-      </Block>
+      </div>
 
-      <Block title="기존 상담 흐름과 제안한 자동화 구조">
-        <div className="grid gap-4 lg:grid-cols-[1fr_1.6fr]">
-          <Panel className="p-4">
-            <p className="text-sm font-bold text-muted">지금: 상담원이 모두 처리</p>
-            <ol className="mt-3 space-y-2">
-              {FLOW_BEFORE.map((s, i) => (
-                <li key={s} className="flex gap-2 text-sm">
-                  <span className="num w-5 shrink-0 font-bold text-muted">{i + 1}</span>
-                  {s}
-                </li>
-              ))}
-            </ol>
-          </Panel>
-          <Panel className="p-4">
-            <p className="text-sm font-bold text-accent">제안: AI가 정해진 순서를 맡고, 사람은 예외를 맡음</p>
-            <ol className="mt-3 grid gap-2 sm:grid-cols-2">
-              {FLOW_AFTER.map(([t, d], i) => (
-                <li key={t} className="rounded-lg bg-bg p-3 text-sm">
-                  <p className="font-semibold">
-                    <span className="num mr-1.5 text-accent">{i + 1}</span>
-                    {t}
-                  </p>
-                  <p className="mt-0.5 text-muted">{d}</p>
-                </li>
-              ))}
-            </ol>
-          </Panel>
-        </div>
-        <ArchitectureDiagram />
-      </Block>
-
-      <Block title="사용한 기술과 채택 이유">
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface">
-          <table className="w-full min-w-[620px] text-left text-sm">
+      <div>
+        <h3 className="font-display text-lg font-bold">각 기술이 맡은 일</h3>
+        <div className="mt-3 overflow-x-auto rounded-xl border border-line">
+          <table className="w-full min-w-[680px] text-left text-sm">
             <thead className="border-b border-line bg-bg text-xs text-muted">
               <tr>
-                <th className="px-4 py-2.5 font-semibold">기술</th>
-                <th className="px-4 py-2.5 font-semibold">해결하는 문제</th>
-                <th className="px-4 py-2.5 font-semibold">상태</th>
+                <th className="px-4 py-2.5 font-bold">기술</th>
+                <th className="px-4 py-2.5 font-bold">맡은 일</th>
+                <th className="px-4 py-2.5 font-bold">상태</th>
               </tr>
             </thead>
             <tbody>
               {STACK.map((s) => (
                 <tr key={s.name} className="border-b border-line last:border-0">
-                  <td className="px-4 py-3 font-semibold">{s.name}</td>
-                  <td className="px-4 py-3 text-muted">{s.solves}</td>
+                  <td className="px-4 py-3 font-bold">{s.name}</td>
+                  <td className="px-4 py-3 leading-relaxed text-muted">{s.role}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-md px-1.5 py-0.5 text-xs font-bold ${s.status === '사용' ? 'bg-accent-soft text-accent-strong' : 'bg-bg text-muted'}`}>
-                      {s.status === '사용' ? '사용함' : '도입 후보'}
+                    <span className={`whitespace-nowrap rounded-md px-1.5 py-0.5 text-xs font-bold ${s.status === '사용' ? 'bg-accent-soft text-accent-strong' : 'bg-bg text-muted'}`}>
+                      {s.status === '사용' ? '구현함' : '아직 안 함'}
                     </span>
                   </td>
                 </tr>
@@ -132,130 +81,73 @@ export function TechSection() {
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-xs text-muted">도입 후보는 이 PoC에서 구현하지 않았어요.</p>
-      </Block>
-
-      <div className="grid gap-8 md:grid-cols-2">
-        <Block title="Voice AI 대화 관리 방식">
-          <ul className="space-y-2 text-[15px] leading-relaxed">
-            <li>대화는 12개 단계의 상태 기계로 관리해요. 단계마다 다음으로 넘어가는 조건이 하나씩 정해져 있어요.</li>
-            <li>장소는 되읽고 "네"를 들어야 확정해요. "아니요"면 다시 묻고, 못 찾으면 큰 건물이나 역 이름을 물어요.</li>
-            <li>언어 모델은 쓰지 않았어요. 택시 호출은 틀리면 안 되는 일이라, 자유 발화 이해는 나중에 붙여도 확정은 규칙이 맡게 했어요.</li>
-          </ul>
-        </Block>
-        <Block title="고령층을 위한 UX 설계">
-          <ul className="space-y-2 text-[15px] leading-relaxed">
-            <li>한 번에 하나만 묻고, '배차'·'픽업' 같은 업무 용어를 쓰지 않아요.</li>
-            <li>차 번호는 "일이, 가, 삼사오육"처럼 끊어 읽고, 원하면 한 번 더 불러줘요.</li>
-            <li>통화 화면 글자는 18px 이상이에요. 마이크가 안 되면 글로 이어서 할 수 있어요.</li>
-            <li>문구는 토스 UX 라이팅 원칙으로 점검했어요. 에러에는 원인과 다음 행동을 함께 써요.</li>
-          </ul>
-        </Block>
-        <Block title="호출 승인과 중복 요청 방지">
-          <ul className="space-y-2 text-[15px] leading-relaxed">
-            <li>대화 엔진: 최종 승인 단계에서 "네"를 들어야만 호출 요청이 생겨요.</li>
-            <li>화면: 같은 시도 번호의 요청은 한 번만 보내요. 버튼을 여러 번 눌러도 마찬가지예요.</li>
-            <li>서버: approved가 true가 아니면 403으로 거절해요. 같은 요청 키는 새로 배차하지 않고 처음 결과를 돌려줘요.</li>
-            <li>Worker: 승인이 없는 작업은 브라우저를 띄우기 전에 거절해요.</li>
-          </ul>
-        </Block>
-        <Block title="Mock Dispatch 구조">
-          <ul className="space-y-2 text-[15px] leading-relaxed">
-            <li>POST /api/dispatch 하나예요. 장소는 이름이 아니라 미리 정한 ID만 받아요.</li>
-            <li>IP별 10분 20회로 제한하고, 요청 키는 10분 뒤 지워요. 아무것도 영구 저장하지 않아요.</li>
-            <li>서버가 꺼지거나 응답이 늦으면 브라우저 안의 같은 Mock으로 계속하고, 화면에 출처를 표시해요.</li>
-            <li>환경변수 DISPATCH_DISABLED=1로 서버 배차를 바로 멈출 수 있어요.</li>
-          </ul>
-        </Block>
       </div>
 
-      <Block title="테스트 결과">
-        <div className="grid gap-4 md:grid-cols-[260px_minmax(0,1fr)]">
-          <Panel className="p-4">
-            <p className="text-xs text-muted">마지막 확인</p>
-            <p className="num mt-0.5 font-bold">{new Date(report.checkedAt).toLocaleString('ko-KR')}</p>
-            <p className="mt-0.5 text-xs text-muted">{report.environment}</p>
-            <dl className="mt-3 space-y-1.5 text-sm">
-              {report.suites.map((s) => (
-                <div key={s.name} className="flex justify-between gap-2">
-                  <dt className="text-muted">{s.name}</dt>
-                  <dd className="num font-semibold" data-testid={`suite-${s.id}`}>
-                    {s.passed}/{s.total} 통과
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </Panel>
-          <div className="overflow-x-auto rounded-xl border border-line bg-surface">
-            <table className="w-full min-w-[520px] text-left text-sm">
-              <thead className="border-b border-line bg-bg text-xs text-muted">
-                <tr>
-                  <th className="px-4 py-2.5 font-semibold">확인 항목</th>
-                  <th className="px-4 py-2.5 font-semibold">방법</th>
-                  <th className="px-4 py-2.5 font-semibold">결과</th>
-                </tr>
-              </thead>
+      <div className="grid gap-6 md:grid-cols-2">
+        <div>
+          <h3 className="font-display text-lg font-bold">어르신을 위한 설계</h3>
+          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[15px] leading-relaxed">
+            <li>처음에 "제 목소리가 잘 들리세요?"로 소리부터 확인해요. 안 들린다고 하면 크고 천천히 말해요.</li>
+            <li>한 번에 하나만 묻고, 들은 장소는 반드시 되읽어요. 이름이 겹치면 번호로 고르게 해요.</li>
+            <li>"뭐라고요?", "천천히 말해 주세요"를 어느 단계에서든 알아들어요. 화면에는 다시 듣기 버튼이 있어요.</li>
+            <li>차 번호는 "일이, 가, 삼사오육"처럼 끊어 읽어요. 대화 글자는 19px이에요.</li>
+            <li>세 번 못 알아들으면 상담원에게 넘겨요.</li>
+          </ul>
+        </div>
+        <div>
+          <h3 className="font-display text-lg font-bold">호출 안전장치</h3>
+          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[15px] leading-relaxed">
+            <li>대화 엔진: 최종 확인에서 "네"를 들어야만 호출 요청이 생겨요. 같은 시도는 한 번만 보내요.</li>
+            <li>Worker: 승인이 없거나 이 사이트가 아닌 주소면 브라우저를 띄우기 전에 거절해요. 다른 주소 요청은 차단하고, 동시에 1개만, 50초 안에 끝내요.</li>
+            <li>배차 API: 승인 없는 요청은 403, 같은 요청 키는 새로 배차하지 않아요. IP별 요청량을 제한해요.</li>
+            <li>실제 카카오 T, 결제, 계정 연동은 없어요. 음성·대화는 저장하지 않아요.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="font-display text-lg font-bold">테스트 결과</h3>
+        <p className="mt-1 text-sm text-muted">
+          마지막 확인 {new Date(report.checkedAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })} · {report.environment}
+        </p>
+        <div className="mt-3 grid gap-3 md:grid-cols-[240px_minmax(0,1fr)]">
+          <dl className="space-y-2 rounded-xl border border-line p-4 text-sm">
+            {report.suites.map((s) => (
+              <div key={s.name} className="flex justify-between gap-2">
+                <dt className="text-muted">{s.name}</dt>
+                <dd className="num font-bold" data-testid={`suite-${s.id}`}>
+                  {s.passed}/{s.total}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <div className="overflow-x-auto rounded-xl border border-line">
+            <table className="w-full min-w-[560px] text-left text-sm">
               <tbody>
                 {report.checks.map((c) => (
                   <tr key={c.item} className="border-b border-line last:border-0">
                     <td className="px-4 py-2.5">{c.item}</td>
                     <td className="px-4 py-2.5 text-muted">{c.how}</td>
-                    <td className={`px-4 py-2.5 font-semibold ${c.result === '통과' ? 'text-accent-strong' : 'text-warn'}`}>{c.result}</td>
+                    <td className={`whitespace-nowrap px-4 py-2.5 font-bold ${c.result === '통과' ? 'text-accent-strong' : 'text-warn'}`}>{c.result}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
-      </Block>
+      </div>
 
-      <Block title="상용화하려면 더 필요한 것">
-        <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            ['실제 통화 데이터로 성공률 측정', '지금 ROI의 성공률 70%는 가정이에요. 녹취 기반 평가가 먼저예요.'],
-            ['전화 음질용 음성 인식', '8kHz 전화 음성, 사투리, 주변 소음에서 다시 검증해야 해요.'],
-            ['배차 플랫폼과의 제휴', '화면 자동화는 화면이 바뀌면 깨져요. 공식 API 제휴가 가장 안정적이에요.'],
-            ['상담원 전환 설계', 'AI가 막히면 대화 기록을 그대로 넘겨 고객이 다시 말하지 않게 해야 해요.'],
-            ['개인정보 처리 기준', '전화번호·위치·녹취 보관 기간과 동의 절차를 정해야 해요.'],
-            ['운영 지표', '자동 처리율, 전환율, 통화 시간, 재통화율을 매일 봐야 해요.'],
-          ].map(([t, d]) => (
-            <li key={t} className="rounded-lg border border-line bg-surface p-4 text-sm">
-              <p className="font-bold">{t}</p>
-              <p className="mt-1 text-muted">{d}</p>
-            </li>
-          ))}
-        </ol>
-      </Block>
-    </div>
-  )
-}
-
-function ArchitectureDiagram() {
-  const nodes: { label: string; sub: string; tag: string; real: boolean }[] = [
-    { label: '고객 음성', sub: '마이크 또는 글', tag: '브라우저', real: true },
-    { label: '음성 인식', sub: 'Web Speech API', tag: '브라우저', real: true },
-    { label: '대화 엔진', sub: '확인 · 승인', tag: '브라우저', real: true },
-    { label: 'Playwright Worker', sub: '업무 웹 조작', tag: '로컬 실행', real: true },
-    { label: 'Mock Dispatch', sub: '/api/dispatch', tag: 'Vercel', real: true },
-    { label: '음성 안내', sub: '음성 합성', tag: '브라우저', real: true },
-  ]
-  return (
-    <div className="mt-4 overflow-x-auto rounded-xl border border-line bg-surface p-4" aria-label="시스템 구조">
-      <ol className="flex min-w-[760px] items-stretch gap-2">
-        {nodes.map((n, i) => (
-          <li key={n.label} className="flex flex-1 items-center gap-2">
-            <div className="flex-1 rounded-lg border border-line bg-bg p-3">
-              <p className="text-[11px] font-semibold text-muted">{n.tag}</p>
-              <p className="mt-0.5 text-sm font-bold">{n.label}</p>
-              <p className="text-xs text-muted">{n.sub}</p>
-            </div>
-            {i < nodes.length - 1 && <ArrowRight size={16} className="shrink-0 text-muted" aria-hidden />}
-          </li>
-        ))}
-      </ol>
-      <p className="mt-3 text-xs text-muted">
-        공개 사이트에서는 Worker 단계를 녹화로 보여주고, 직접 체험은 대화 엔진에서 Mock Dispatch API로 바로 요청해요. 실제 택시 플랫폼과는 연결되어 있지 않아요.
-      </p>
+      <div>
+        <h3 className="font-display text-lg font-bold">상용화하려면 더 필요한 것</h3>
+        <ul className="mt-3 grid gap-x-8 gap-y-2 text-[15px] sm:grid-cols-2">
+          <li>실제 통화 녹취로 자동 처리 성공률 측정 (지금 비용 계산의 70%는 가정)</li>
+          <li>전화 음질·어르신 발화에서 음성 인식 재검증</li>
+          <li>배차 플랫폼 공식 API 제휴 또는 화면 변경 감지</li>
+          <li>AI가 막힐 때 대화 기록을 상담원에게 그대로 넘기기</li>
+          <li>전화번호·위치·녹취 보관 기준과 동의 절차</li>
+          <li>자동 처리율, 전환율, 통화 시간, 재통화율 지표</li>
+        </ul>
+      </div>
     </div>
   )
 }
